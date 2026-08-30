@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migration Skill"
+  short_description: "行为保持型代码库迁移与验证"
+  default_prompt: "Use $migration-skill to migrate this codebase while preserving externally observable behavior."

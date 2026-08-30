@@ -84,4 +84,3 @@ evaluate_migration.py --baseline PATH --source PATH --target PATH --parity PATH 
 ```
 
 All helpers return `0` for success, `1` for an expected verification failure, and `2` for invalid input or frozen-state integrity failure.
-
