@@ -1,0 +1,39 @@
+{
+  "actual_freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+  "actual_target_revision": null,
+  "actual_target_tree_digest": "sha256:9c246f6ebf68be81be0918ea5614eaf4407719c82bce5580ca91fc29ce7e59e8",
+  "checkpoint": {
+    "accepted_at": "2026-08-31T11:52:11.754159+00:00",
+    "freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+    "id": "checkpoint-M2",
+    "milestone_id": "M2",
+    "protected_cases": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ],
+    "protected_checks": [
+      "target-tests"
+    ],
+    "result_digest": "sha256:2402de010c6877d713cecc577cd46eb6353b9d549a5c8891b30bf73c80c2e6ec",
+    "result_status": "eligible",
+    "target_revision": null,
+    "target_root": ".\\generated-target",
+    "target_tree_digest": "sha256:9c246f6ebf68be81be0918ea5614eaf4407719c82bce5580ca91fc29ce7e59e8",
+    "verification_score": 1.0
+  },
+  "expected_freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+  "expected_target_revision": null,
+  "expected_target_tree_digest": "sha256:9c246f6ebf68be81be0918ea5614eaf4407719c82bce5580ca91fc29ce7e59e8",
+  "freeze_intact": true,
+  "freeze_manifest_matches": true,
+  "last_accepted_milestone": "M2",
+  "schema_version": 1,
+  "status": "ready",
+  "target_revision_matches": true,
+  "target_root": ".\\generated-target",
+  "target_tree_digest_matches": true,
+  "valid": true
+}

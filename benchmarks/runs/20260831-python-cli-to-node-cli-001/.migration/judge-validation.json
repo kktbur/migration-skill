@@ -1,0 +1,36 @@
+{
+  "artifact_type": "judge-validation-v1",
+  "generated_by": "validate_judge.py",
+  "mutation_plan_path": ".migration/mutation-plan.json",
+  "mutation_plan_sha256": "sha256:6732b50dbb1ba2ea22b5238cc58f1a82479339f009e51a8017eed6e5c8cee7d3",
+  "negative_control": true,
+  "negative_controls": [
+    {
+      "detected": true,
+      "expected_case": "normal-json",
+      "expected_operation": "invoke",
+      "mutation_id": "change-normal-greeting",
+      "reason": null,
+      "result_path": ".migration/results/negative-normal-json.json",
+      "result_sha256": "sha256:e6d55bbf45ddd5bcd3ab227df5425484cfdef04e113c0ed790cc9bb71118cf8f"
+    },
+    {
+      "detected": true,
+      "expected_case": "invalid-option",
+      "expected_operation": "invoke",
+      "mutation_id": "change-error-exit-code",
+      "reason": null,
+      "result_path": ".migration/results/negative-invalid-option.json",
+      "result_sha256": "sha256:f6fea1741f8f2cb054c2b40f6ed7479e759822b48c207fbbffa541363bda8c42"
+    }
+  ],
+  "path_mode": "relative",
+  "positive_control": true,
+  "positive_result_path": ".migration/results/positive-source.json",
+  "positive_result_sha256": "sha256:9dd18f1ad3fe3ed1e7b5383e6f6bfdb89a7611e0b3b1aacd52c8034d9d86c2e4",
+  "schema_version": 1,
+  "source_revision": null,
+  "source_tree_digest": "sha256:94d3221c31ce88d7a74025604bd6b762d7c1ceaf7b20fd8c51a21f97ba5b08b9",
+  "valid": true,
+  "workspace_root": ".."
+}

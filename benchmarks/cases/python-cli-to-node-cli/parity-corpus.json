@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "cases": [
+    {"id": "normal-json", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", "Ada"]}, "required": true},
+    {"id": "normal-text", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", "Ada", "--format", "text"]}, "required": true},
+    {"id": "uppercase", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", "Ada", "--uppercase"]}, "required": true},
+    {"id": "unicode", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", "张三"]}, "required": true},
+    {"id": "empty-name", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", ""]}, "required": true},
+    {"id": "invalid-option", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--unknown"]}, "required": true},
+    {"id": "missing-argument", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name"]}, "required": true},
+    {"id": "invalid-format", "surface_id": "main-cli", "operation_id": "invoke", "input": {"argv": ["--name", "Ada", "--format", "xml"]}, "required": true}
+  ]
+}

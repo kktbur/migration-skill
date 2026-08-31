@@ -19,7 +19,7 @@ The Source may already have failures. Record them as `inherited_failures` in `ba
 - every required public surface has declared operations, evidence, and coverage;
 - no required gap remains;
 - Judge positive and targeted negative controls have both been validated;
-- a previously accepted target checkpoint, when present, still matches its target revision/tree digest.
+- all milestones in the validated migration plan are accepted. The last target checkpoint is validated before the next edit by `verify_resume.py`; the final evaluator does not compare a later Target digest with an older checkpoint.
 
 Optional cases may remain in `PARTIALLY_VERIFIED`, but must be listed in the report. A percentage or score is report-only and never overrides a required failure.
 
@@ -35,9 +35,17 @@ Do not invent tolerance during a failing migration. If dynamic values make a com
 
 The positive control must be a passing compare artifact with no required failures. Each negative control must name a required case and a mutation result in which that case is actually mismatched. An unrelated optional mismatch, a free-standing `negative_control: true`, or a pair of hand-written booleans is not evidence. `validate_judge.py` emits the only artifact accepted by `freeze_contract.py`.
 
-## Ratchet
+## Milestone Gate and Ratchet
 
-Every accepted checkpoint must preserve the previous accepted verification score and all required conditions. `advance_milestone.py` performs this comparison and the atomic `state.json` update. A lower result, a missing required gate, or an invalid target digest is rejected and requires repair or rollback.
+`evaluate_milestone.py` evaluates only the current milestone. Future required cases may be missing, while every current required case and every previously protected case must pass. `advance_milestone.py` performs the atomic `state.json` update. Its proof-set rule is:
+
+```text
+previously protected cases/checks ⊆ current passing proof set
+```
+
+A missing protected item, missing current gate, unmet dependency, or invalid target digest is rejected and requires repair or rollback. Verification scores remain report-only and are not the acceptance rule.
+
+Before a new milestone edit, `verify_resume.py` compares the current Target revision/tree digest with the last accepted checkpoint. If a user or another process changed the Target, the preflight is `invalidated` and the migration must stop until the checkpoint is rebuilt or explicitly re-approved.
 
 ## Completion states
 

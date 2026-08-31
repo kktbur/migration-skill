@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "os": "Windows",
+  "platform": "win32",
+  "python": "python",
+  "python_version": "3.12.13",
+  "node": "node",
+  "node_version": "v24.19.0",
+  "codex_version": "unavailable",
+  "model": "unavailable",
+  "network": "not required",
+  "sandbox": "local fixture; no production or credential access"
+}

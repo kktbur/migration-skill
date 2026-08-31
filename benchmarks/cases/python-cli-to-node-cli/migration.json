@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "source": {
+    "root": "source",
+    "revision": "AUTO",
+    "language": "Python",
+    "framework": "stdlib CLI",
+    "entrypoints": ["cli.py"]
+  },
+  "target": {
+    "root": "generated-target",
+    "language": "Node.js",
+    "framework": "Node CLI",
+    "entrypoints": ["cli.js"]
+  },
+  "public_surfaces": [
+    {
+      "id": "main-cli",
+      "kind": "command",
+      "required": true,
+      "source_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "target_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "compare": {"whole": {"mode": "json-semantic"}},
+      "evidence": ["source/cli.py", "source/adapter.py", "source/test_cli.py"],
+      "confidence": "high",
+      "operations": [
+        {
+          "id": "invoke",
+          "required": true,
+          "description": "Invoke the CLI and observe exit code plus stdout value.",
+          "evidence": [
+            {"path": "source/cli.py", "type": "entrypoint"},
+            {"path": "source/test_cli.py", "type": "existing-test"}
+          ]
+        }
+      ]
+    }
+  ],
+  "completion_gates": {"required_check_kinds": ["test"]},
+  "checks": {
+    "source": [
+      {
+        "id": "source-tests",
+        "kind": "test",
+        "argv": ["${PYTHON}", "-m", "unittest", "discover", "-s", ".", "-q"]
+      }
+    ],
+    "target": [
+      {
+        "id": "target-tests",
+        "kind": "test",
+        "argv": ["${NODE}", "test.js"]
+      }
+    ]
+  },
+  "parity_corpus": "parity-corpus.json"
+}

@@ -1,0 +1,154 @@
+{
+  "check_specification": {
+    "checks": {
+      "source": [
+        {
+          "argv": [
+            "${PYTHON}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            ".",
+            "-q"
+          ],
+          "id": "source-tests",
+          "kind": "test"
+        }
+      ],
+      "target": [
+        {
+          "argv": [
+            "${NODE}",
+            "test.js"
+          ],
+          "id": "target-tests",
+          "kind": "test"
+        }
+      ]
+    },
+    "completion_gates": {
+      "required_check_kinds": [
+        "test"
+      ]
+    },
+    "environment": {}
+  },
+  "check_specification_digest": "sha256:550af0376457aa1121098ed442eb0f767074c303a3ad4ad74fd9053739b82436",
+  "files": {
+    "contract": {
+      "path": ".migration/migration.json",
+      "sha256": "sha256:111c5d347e82d96edb297823212f49f8590551727947750745035b366567988c"
+    },
+    "corpus": {
+      "path": ".migration/parity-corpus.json",
+      "sha256": "sha256:7a22315ae5c2666f42cf809eadcb5cc143f2604ed6a649a45a4ed0c9809cb95c"
+    },
+    "evaluator": {
+      "path": "migration-skill/scripts/evaluate_migration.py",
+      "sha256": "sha256:ee0a80938b2295f8f05d609689f4430862ec0e9d720e7a9d6a81244627b8bd99"
+    },
+    "judge_validation": {
+      "path": ".migration/judge-validation.json",
+      "sha256": "sha256:cdb50a991cacc6a3ac67b9944bbde8d70347f2a4065bde0d27e95e93b86a1357"
+    }
+  },
+  "judge_validation": {
+    "artifact_type": "judge-validation-v1",
+    "source_revision": null,
+    "valid": true
+  },
+  "normalization_policy": {
+    "contract_normalization": {},
+    "surface_comparators": {
+      "main-cli": {
+        "whole": {
+          "mode": "json-semantic"
+        }
+      }
+    }
+  },
+  "path_mode": "relative",
+  "policy": {
+    "evaluator_change": "invalidate-and-rebuild-evidence",
+    "required_case_removal": "forbidden-without-explicit-reapproval",
+    "required_operation_removal": "forbidden-without-explicit-reapproval",
+    "source_revision_change": "invalidate-and-rebuild-evidence",
+    "verifier_bundle_change": "invalidate-and-rebuild-evidence"
+  },
+  "portable": true,
+  "schema_version": 3,
+  "source": {
+    "revision": null,
+    "root": "source",
+    "tree_digest": "sha256:94d3221c31ce88d7a74025604bd6b762d7c1ceaf7b20fd8c51a21f97ba5b08b9"
+  },
+  "tool_version": "0.3.0",
+  "verifier_bundle": {
+    "files": {
+      "advance_milestone.py": {
+        "path": "migration-skill/scripts/advance_milestone.py",
+        "sha256": "sha256:507ede1b53722cb6ef50547f03dce55a8490c96fd5c9aa0689567fa5ef58854c"
+      },
+      "capture_baseline.py": {
+        "path": "migration-skill/scripts/capture_baseline.py",
+        "sha256": "sha256:c3965196d62fcc49b5f68a171b144add6cecb5388d39a177aedeac73e744b7a8"
+      },
+      "common.py": {
+        "path": "migration-skill/scripts/common.py",
+        "sha256": "sha256:9051c48f0e0c87e0f318a7343876b51b79f5cc20771a32599a07cb468c0a8e29"
+      },
+      "compare_results.py": {
+        "path": "migration-skill/scripts/compare_results.py",
+        "sha256": "sha256:6d9a68d93bd2db3049c27e8bef82c32a7c2bc9f1a8064182117670a036c92e07"
+      },
+      "evaluate_migration.py": {
+        "path": "migration-skill/scripts/evaluate_migration.py",
+        "sha256": "sha256:ee0a80938b2295f8f05d609689f4430862ec0e9d720e7a9d6a81244627b8bd99"
+      },
+      "evaluate_milestone.py": {
+        "path": "migration-skill/scripts/evaluate_milestone.py",
+        "sha256": "sha256:6d1a536a8a38bb6763520720fedefcf86d6b8af0ee5dc18352df6db4d7c8593f"
+      },
+      "freeze_contract.py": {
+        "path": "migration-skill/scripts/freeze_contract.py",
+        "sha256": "sha256:6ef2323fae7368e9b14de4a092d80b707b208ef6de91c145c70cf860b37739d7"
+      },
+      "inventory_project.py": {
+        "path": "migration-skill/scripts/inventory_project.py",
+        "sha256": "sha256:9daec26cd431462c8c6b88d66f04c364b5b3eb55e9d81a82d36ccb9e0937b256"
+      },
+      "run_checks.py": {
+        "path": "migration-skill/scripts/run_checks.py",
+        "sha256": "sha256:d9aecccec0ccd63946788cecb5d95f13722e6ef850ba310c90e42775d59479ad"
+      },
+      "run_parity.py": {
+        "path": "migration-skill/scripts/run_parity.py",
+        "sha256": "sha256:abd663e5831ae34c37c2e4aa11493e96909b7d37f57aa08760849ba18c16cd63"
+      },
+      "validate_contract.py": {
+        "path": "migration-skill/scripts/validate_contract.py",
+        "sha256": "sha256:51884e6444a9c174dfcab1b2af210413f8e40dfa3549bdad19e26b9e05bfe0a8"
+      },
+      "validate_judge.py": {
+        "path": "migration-skill/scripts/validate_judge.py",
+        "sha256": "sha256:0138330b2a0a090b4d4ead944bcd4a65312701c7d144869634e78da533b720a7"
+      },
+      "validate_plan.py": {
+        "path": "migration-skill/scripts/validate_plan.py",
+        "sha256": "sha256:6fef9bc0d32e63ce80ec5b7c9c02fc24aeb0d05c6843207b75d3ac406ffd6cd2"
+      },
+      "validate_skill.py": {
+        "path": "migration-skill/scripts/validate_skill.py",
+        "sha256": "sha256:f1c40300666792e5a03bdcd4388a2dcf72902a351cee0eb9d29719a5310e422d"
+      },
+      "verify_resume.py": {
+        "path": "migration-skill/scripts/verify_resume.py",
+        "sha256": "sha256:f1d140b56ee330a7012790ede5dfd7c242dc0296870dabd48d7136983a8260a5"
+      }
+    },
+    "root": "migration-skill/scripts",
+    "tool_version": "0.3.0"
+  },
+  "workspace_root": ".."
+}

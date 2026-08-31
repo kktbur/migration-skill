@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "cases": [
+    {"id": "health", "surface_id": "http-api", "operation_id": "GET-/health", "input": {"method": "GET", "path": "/health"}, "required": true},
+    {"id": "user-found", "surface_id": "http-api", "operation_id": "GET-/users/:id", "input": {"method": "GET", "path": "/users/1"}, "required": true},
+    {"id": "user-missing", "surface_id": "http-api", "operation_id": "GET-/users/:id", "input": {"method": "GET", "path": "/users/999"}, "required": true},
+    {"id": "create-user", "surface_id": "http-api", "operation_id": "POST-/users", "input": {"method": "POST", "path": "/users", "json": {"name": "Lin"}}, "required": true},
+    {"id": "create-missing-name", "surface_id": "http-api", "operation_id": "POST-/users", "input": {"method": "POST", "path": "/users", "json": {}}, "required": true},
+    {"id": "create-empty-name", "surface_id": "http-api", "operation_id": "POST-/users", "input": {"method": "POST", "path": "/users", "json": {"name": ""}}, "required": true}
+  ]
+}

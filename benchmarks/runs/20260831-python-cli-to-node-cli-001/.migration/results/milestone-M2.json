@@ -1,0 +1,130 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [
+    "empty-name",
+    "unicode",
+    "uppercase"
+  ],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "M1 proof remains passing",
+      "all declared error cases match"
+    ],
+    "depends_on": [
+      "M1"
+    ],
+    "id": "M2",
+    "name": "CLI error semantics",
+    "required_cases": [
+      "invalid-option",
+      "missing-argument",
+      "invalid-format"
+    ],
+    "required_checks": [
+      "target-tests"
+    ],
+    "rollback_boundary": "target checkpoint M2",
+    "scope": [
+      "argument validation",
+      "exit code 2"
+    ]
+  },
+  "milestone_id": "M2",
+  "plan_digest": "sha256:9824ad3ec06d9e78d36ad2fe3e03f6c3b8e1da4de05d1e544e919d6c09504325",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "normal-json",
+      "normal-text"
+    ],
+    "required": [
+      "normal-json",
+      "normal-text"
+    ]
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-tests"
+    ],
+    "required": [
+      "target-tests"
+    ],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument"
+    ],
+    "required": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-tests"
+    ],
+    "required": [
+      "target-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": ".\\generated-target",
+    "tree_digest": "sha256:9c246f6ebf68be81be0918ea5614eaf4407719c82bce5580ca91fc29ce7e59e8"
+  }
+}

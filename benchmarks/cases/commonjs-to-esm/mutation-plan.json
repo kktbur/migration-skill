@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "negative_controls": [
+    {
+      "mutation_id": "change-default-greeting",
+      "expected_case": "default-greet",
+      "expected_operation": "default-export",
+      "mutation": "Change the default greeting value.",
+      "result": "runs/<run-id>/negative-default.json"
+    },
+    {
+      "mutation_id": "change-error-message",
+      "expected_case": "empty-name-error",
+      "expected_operation": "error-semantics",
+      "mutation": "Change the empty-name error message.",
+      "result": "runs/<run-id>/negative-error.json"
+    }
+  ]
+}

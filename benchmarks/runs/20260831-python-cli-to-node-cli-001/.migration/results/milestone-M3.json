@@ -1,0 +1,136 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "M1 and M2 proof remains passing",
+      "all boundary cases match"
+    ],
+    "depends_on": [
+      "M2"
+    ],
+    "id": "M3",
+    "name": "Boundary behavior and cleanup",
+    "required_cases": [
+      "empty-name",
+      "unicode",
+      "uppercase"
+    ],
+    "required_checks": [
+      "target-tests"
+    ],
+    "rollback_boundary": "target checkpoint M3",
+    "scope": [
+      "empty input",
+      "Unicode",
+      "uppercase option"
+    ]
+  },
+  "milestone_id": "M3",
+  "plan_digest": "sha256:9824ad3ec06d9e78d36ad2fe3e03f6c3b8e1da4de05d1e544e919d6c09504325",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "empty-name",
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text",
+      "unicode",
+      "uppercase"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ],
+    "required": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ]
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-tests"
+    ],
+    "required": [
+      "target-tests"
+    ],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "empty-name",
+      "unicode",
+      "uppercase"
+    ],
+    "required": [
+      "empty-name",
+      "unicode",
+      "uppercase"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-tests"
+    ],
+    "required": [
+      "target-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": ".\\generated-target",
+    "tree_digest": "sha256:5f1ac91d1c183104ce99d2a2a10a73b34e65465bf4400c1cb99ae938613a376e"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "FastAPI skeleton and health route",
+      "depends_on": [],
+      "required_cases": ["health"],
+      "required_checks": ["target-tests"],
+      "scope": ["application startup", "GET /health"],
+      "acceptance": ["health parity passes"]
+    },
+    {
+      "id": "M2",
+      "name": "User lookup route",
+      "depends_on": ["M1"],
+      "required_cases": ["user-found", "user-missing"],
+      "required_checks": ["target-tests"],
+      "scope": ["GET /users/:id", "not-found behavior"],
+      "acceptance": ["health and user lookup proof remains passing"]
+    },
+    {
+      "id": "M3",
+      "name": "User creation validation",
+      "depends_on": ["M2"],
+      "required_cases": ["create-user", "create-missing-name", "create-empty-name"],
+      "required_checks": ["target-tests"],
+      "scope": ["POST /users", "validation status and JSON"],
+      "acceptance": ["all declared HTTP cases pass"]
+    }
+  ]
+}

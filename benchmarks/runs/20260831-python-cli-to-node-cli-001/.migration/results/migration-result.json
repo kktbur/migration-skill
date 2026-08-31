@@ -1,0 +1,231 @@
+{
+  "baseline_capture_clean": true,
+  "baseline_capture_reliable": true,
+  "baseline_identity_matches": true,
+  "freeze_intact": true,
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge": {
+    "errors": [],
+    "negative_control": true,
+    "positive_control": true,
+    "source": "frozen-judge-validation",
+    "valid": true
+  },
+  "migration_score": 1.0,
+  "parity": {
+    "coverage": {
+      "all_required_cases_passed": true,
+      "all_required_cases_present": true,
+      "all_required_operations_covered": true,
+      "all_required_surfaces_covered": true,
+      "covered_operations": [
+        "main-cli/invoke"
+      ],
+      "covered_surfaces": [
+        "main-cli"
+      ],
+      "declared_operations": [
+        "main-cli/invoke"
+      ],
+      "failed_cases": [],
+      "missing_cases": [],
+      "missing_operations": [],
+      "missing_surfaces": [],
+      "operation_coverage_available": true,
+      "required_cases": [
+        "empty-name",
+        "invalid-format",
+        "invalid-option",
+        "missing-argument",
+        "normal-json",
+        "normal-text",
+        "unicode",
+        "uppercase"
+      ],
+      "required_operations": [
+        "main-cli/invoke"
+      ],
+      "required_surfaces": [
+        "main-cli"
+      ]
+    },
+    "passed": true,
+    "reported_status": "passed",
+    "summary": {
+      "detected_mismatch_cases": [],
+      "expected_mismatch_cases": [],
+      "failed": 0,
+      "mismatch_detected": false,
+      "optional_failed": [],
+      "passed": 8,
+      "required_failed": [],
+      "targeted_control_passed": null,
+      "targeted_mismatch_failures": [],
+      "total": 8
+    }
+  },
+  "plan": {
+    "all_milestones_completed": true,
+    "completed_milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "errors": [],
+    "milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "provided": true
+  },
+  "proof_set": {
+    "cases": [
+      "empty-name",
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text",
+      "unicode",
+      "uppercase"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "ratchet_eligible": true,
+  "required_conditions": {
+    "all_milestones_completed": true,
+    "baseline_capture_clean": true,
+    "baseline_capture_reliable": true,
+    "baseline_identity_matches": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "operation_coverage": true,
+    "parity": true,
+    "plan_valid": true,
+    "public_surface_coverage": true,
+    "required_quality_gates": true,
+    "resume_checkpoint": true,
+    "target_required_checks": true
+  },
+  "required_gaps": [],
+  "resume": {
+    "checkpoint_validation": {
+      "checkpoint": {
+        "accepted_at": "2026-08-31T11:54:24.877032+00:00",
+        "freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+        "id": "checkpoint-M3",
+        "milestone_id": "M3",
+        "protected_cases": [
+          "empty-name",
+          "invalid-format",
+          "invalid-option",
+          "missing-argument",
+          "normal-json",
+          "normal-text",
+          "unicode",
+          "uppercase"
+        ],
+        "protected_checks": [
+          "target-tests"
+        ],
+        "result_digest": "sha256:3fce96de3558d321c0f1f48069ddfaa6c03cb932e35a42065b1fd92166e094c9",
+        "result_status": "eligible",
+        "target_revision": null,
+        "target_root": ".\\generated-target",
+        "target_tree_digest": "sha256:5f1ac91d1c183104ce99d2a2a10a73b34e65465bf4400c1cb99ae938613a376e",
+        "verification_score": 1.0
+      },
+      "preflight_script": "verify_resume.py",
+      "status": "preflight-required",
+      "valid": true
+    },
+    "completed_milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "current_milestone": null,
+    "last_accepted_checkpoint": {
+      "accepted_at": "2026-08-31T11:54:24.877032+00:00",
+      "freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+      "id": "checkpoint-M3",
+      "milestone_id": "M3",
+      "protected_cases": [
+        "empty-name",
+        "invalid-format",
+        "invalid-option",
+        "missing-argument",
+        "normal-json",
+        "normal-text",
+        "unicode",
+        "uppercase"
+      ],
+      "protected_checks": [
+        "target-tests"
+      ],
+      "result_digest": "sha256:3fce96de3558d321c0f1f48069ddfaa6c03cb932e35a42065b1fd92166e094c9",
+      "result_status": "eligible",
+      "target_revision": null,
+      "target_root": ".\\generated-target",
+      "target_tree_digest": "sha256:5f1ac91d1c183104ce99d2a2a10a73b34e65465bf4400c1cb99ae938613a376e",
+      "verification_score": 1.0
+    }
+  },
+  "schema_version": 2,
+  "score_is_informational_only": true,
+  "source_baseline_regressed": false,
+  "source_regressions": [],
+  "status": "VERIFIED",
+  "target": {
+    "checks_passed": true,
+    "observation": {
+      "expected": [
+        "target-tests"
+      ],
+      "observed": [
+        "target-tests"
+      ],
+      "required_failures": []
+    },
+    "quality_gates": {
+      "build": {
+        "checks": [],
+        "configured": false,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [],
+        "passed": true,
+        "required": false
+      },
+      "static": {
+        "checks": [],
+        "configured": false,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [],
+        "passed": true,
+        "required": false
+      },
+      "test": {
+        "checks": [
+          "target-tests"
+        ],
+        "configured": true,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [
+          "target-tests"
+        ],
+        "passed": true,
+        "required": true
+      }
+    },
+    "required_failures": []
+  }
+}

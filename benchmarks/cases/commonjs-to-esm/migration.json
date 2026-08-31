@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "source": {
+    "root": "source",
+    "revision": "AUTO",
+    "language": "JavaScript",
+    "framework": "CommonJS",
+    "entrypoints": ["index.cjs", "package.json"]
+  },
+  "target": {
+    "root": "generated-target",
+    "language": "JavaScript",
+    "framework": "ESM",
+    "entrypoints": ["index.js", "package.json"]
+  },
+  "public_surfaces": [
+    {
+      "id": "package-api",
+      "kind": "library",
+      "required": true,
+      "source_adapter": {"kind": "harness", "argv": ["${NODE}", "adapter.cjs"]},
+      "target_adapter": {"kind": "harness", "argv": ["${NODE}", "adapter.mjs"]},
+      "compare": {"whole": {"mode": "json-semantic"}},
+      "evidence": ["source/index.cjs", "source/package.json", "source/test.cjs"],
+      "confidence": "high",
+      "operations": [
+        {
+          "id": "default-export",
+          "required": true,
+          "description": "Preserve the package default greeting export.",
+          "evidence": [
+            {"path": "source/index.cjs", "type": "export-definition"},
+            {"path": "source/test.cjs", "type": "existing-test"}
+          ]
+        },
+        {
+          "id": "named-export",
+          "required": true,
+          "description": "Preserve the named add export and numeric result.",
+          "evidence": [
+            {"path": "source/index.cjs", "type": "export-definition"},
+            {"path": "source/test.cjs", "type": "existing-test"}
+          ]
+        },
+        {
+          "id": "error-semantics",
+          "required": true,
+          "description": "Preserve validation error type and message.",
+          "evidence": [
+            {"path": "source/index.cjs", "type": "error-path"},
+            {"path": "source/test.cjs", "type": "existing-test"}
+          ]
+        }
+      ]
+    }
+  ],
+  "completion_gates": {"required_check_kinds": ["test"]},
+  "checks": {
+    "source": [{"id": "source-tests", "kind": "test", "argv": ["${NODE}", "test.cjs"]}],
+    "target": [{"id": "target-tests", "kind": "test", "argv": ["${NODE}", "test.mjs"]}]
+  },
+  "parity_corpus": "parity-corpus.json"
+}

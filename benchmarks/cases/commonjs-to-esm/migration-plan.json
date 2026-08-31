@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "ESM package entrypoint and default export",
+      "depends_on": [],
+      "required_cases": ["default-greet"],
+      "required_checks": ["target-tests"],
+      "scope": ["package.json entrypoint", "default export"],
+      "acceptance": ["default import behavior matches"]
+    },
+    {
+      "id": "M2",
+      "name": "Named export",
+      "depends_on": ["M1"],
+      "required_cases": ["named-add"],
+      "required_checks": ["target-tests"],
+      "scope": ["named add export"],
+      "acceptance": ["default export proof remains passing", "named export matches"]
+    },
+    {
+      "id": "M3",
+      "name": "Error semantics and cleanup",
+      "depends_on": ["M2"],
+      "required_cases": ["empty-name-error", "invalid-add-error"],
+      "required_checks": ["target-tests"],
+      "scope": ["error type", "error message", "module cleanup"],
+      "acceptance": ["all package behavior cases match"]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "checkpoint": {
+    "accepted_at": "2026-08-31T11:51:06.771518+00:00",
+    "freeze_manifest_sha256": "sha256:182151fc887d07b506d7ca8cd9b7420f25fda77d2b35b52b790f35427b84c9df",
+    "id": "checkpoint-M1",
+    "milestone_id": "M1",
+    "protected_cases": [
+      "normal-json",
+      "normal-text"
+    ],
+    "protected_checks": [
+      "target-tests"
+    ],
+    "result_digest": "sha256:5ac08c1423929edcc0a1c265e4355693606ca3b67798f3191d5bca5ec433424d",
+    "result_status": "eligible",
+    "target_revision": null,
+    "target_root": ".\\generated-target",
+    "target_tree_digest": "sha256:d487156eb52cf0760a35e38449872b8073cb187ab532903b27dd5e377833bfbb",
+    "verification_score": 1.0
+  },
+  "milestone_id": "M1",
+  "proof_set": {
+    "cases": [
+      "normal-json",
+      "normal-text"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "status": "accepted"
+}

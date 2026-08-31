@@ -36,6 +36,7 @@ from run_checks import run_checks  # noqa: E402
 from run_parity import run_parity  # noqa: E402
 from validate_contract import validate_documents  # noqa: E402
 from validate_judge import validate_artifact, validate_judge  # noqa: E402
+from verify_resume import verify_resume  # noqa: E402
 
 
 class MigrationScriptsTest(unittest.TestCase):
@@ -225,7 +226,7 @@ class MigrationScriptsTest(unittest.TestCase):
             },
         )
         judge_path = base / "judge-validation.json"
-        judge = validate_judge(positive_path, plan_path, judge_path, source_root=source)
+        judge = validate_judge(positive_path, plan_path, judge_path, source_root=source, workspace_root=base)
         self.assertTrue(judge["valid"], judge)
         manifest_path = base / "freeze-manifest.json"
         verifier_root = base / "verifier"
@@ -238,6 +239,7 @@ class MigrationScriptsTest(unittest.TestCase):
             manifest_path,
             judge_path,
             verifier_root,
+            base,
         )
         baseline = capture(source, contract, "source")
         source_checks = run_checks(source, contract, "source", {}, 20000)
@@ -245,13 +247,16 @@ class MigrationScriptsTest(unittest.TestCase):
         target_parity = run_parity(target, contract, corpus, "target")
         parity = compare(source_parity, target_parity, contract, corpus)
         state = {
+            "schema_version": 2,
             "source_revision": manifest["source"]["revision"],
             "current_milestone": "M001",
             "completed_milestones": [],
+            "protected_cases": [],
+            "protected_checks": [],
             "last_accepted_checkpoint": None,
             "required_gaps": [],
         }
-        freeze_result = {"intact": True, "manifest": manifest}
+        freeze_result = verify_freeze(manifest_path)
         return {
             "temporary": temporary,
             "base": base,
@@ -459,6 +464,24 @@ class MigrationScriptsTest(unittest.TestCase):
             self.assertEqual(report["status"], "captured_with_inherited_failures")
             self.assertEqual(report["inherited_failures"], ["inherited"])
 
+    def test_baseline_accepts_explicit_nonsecret_variables(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            spec = {
+                "checks": [
+                    {
+                        "id": "variable",
+                        "kind": "test",
+                        "argv": [sys.executable, "-c", "import sys; raise SystemExit(0 if sys.argv[1] == 'test' else 3)", "${NODE_ENV}"],
+                    }
+                ]
+            }
+            report = capture(root, spec, "source", variables={"NODE_ENV": "test"})
+            self.assertEqual(report["status"], "captured_clean")
+            self.assertEqual(report["checks"][0]["status"], "passed")
+            with self.assertRaises(ValueError):
+                capture(root, spec, "source", variables={"OPENAI_API_KEY": "blocked"})
+
     def test_inherited_failure_is_not_new_regression_but_new_failure_is(self):
         baseline = {
             "checks": [{"id": "inherited", "status": "failed"}, {"id": "stable", "status": "passed"}],
@@ -524,7 +547,7 @@ class MigrationScriptsTest(unittest.TestCase):
                 accepted_state,
                 fixture["freeze"],
             )
-            self.assertEqual(resumed_report["resume"]["checkpoint_validation"]["status"], "verified")
+            self.assertEqual(resumed_report["resume"]["checkpoint_validation"]["status"], "preflight-required")
             before = state_path.read_text(encoding="utf-8")
             rejected_result = dict(result, ratchet_eligible=False)
             write_json(result_path, rejected_result)
@@ -532,17 +555,13 @@ class MigrationScriptsTest(unittest.TestCase):
             self.assertEqual(rejected["status"], "rejected")
             self.assertEqual(before, state_path.read_text(encoding="utf-8"))
             (fixture["target"] / "cli.py").write_text("changed\n", encoding="utf-8")
-            invalidated = evaluate(
-                fixture["baseline"],
-                fixture["source_checks"],
-                fixture["target_checks"],
-                fixture["parity"],
-                fixture["contract"],
-                fixture["corpus"],
-                accepted_state,
-                fixture["freeze"],
+            invalidated = verify_resume(
+                state_path,
+                fixture["target"],
+                fixture["manifest_path"],
+                fixture["base"] / "resume-invalid.json",
             )
-            self.assertEqual(invalidated["status"], "INVALIDATED")
+            self.assertEqual(invalidated["status"], "invalidated")
         finally:
             fixture["temporary"].cleanup()
 

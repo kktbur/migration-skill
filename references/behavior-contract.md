@@ -178,3 +178,28 @@ Schema v1 remains readable for compatibility, but its surface-only coverage cann
 First run the positive Source Judge, then run targeted negative controls against deliberately mutated required cases. `scripts/validate_judge.py` produces the only accepted Judge artifact. `scripts/freeze_contract.py` then freezes the Source revision/tree digest, Contract, Corpus, Judge artifact, check specification, normalization policy, and every Python file in the verifier bundle.
 
 After Freeze, do not remove a required case or operation, lower its required flag, widen a comparator, or edit verifier code to make a migration pass. Revalidate and create a new Freeze only after explicit approval.
+
+## Migration plan and operation/case semantics
+
+The post-Freeze migration plan is a separate `.migration/migration-plan.json` document. It contains bounded, dependency-aware units rather than putting progress state into `state.json`:
+
+```json
+{
+  "schema_version": 1,
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Port normal invocation",
+      "depends_on": [],
+      "required_cases": ["normal-name"],
+      "required_checks": ["target-tests"],
+      "scope": ["target command entrypoint"],
+      "rollback_boundary": "target checkpoint M1"
+    }
+  ]
+}
+```
+
+`required_cases` names concrete inputs and can grow across milestones. `required_checks` names configured Target checks. `validate_plan.py` rejects duplicate IDs, missing dependencies, dependency cycles, unknown cases/checks, and references to optional cases.
+
+An operation is an atomic public capability; a case is one input instance for that operation. For example, `mytool import`, `mytool export`, and `mytool serve` are separate operations, while valid, empty, and invalid files for `mytool import` are separate cases under one operation. Final coverage requires all required operations and cases; a milestone only protects the cases it declares after they pass.

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "negative_controls": [
+    {
+      "mutation_id": "change-health-status",
+      "expected_case": "health",
+      "expected_operation": "GET-/health",
+      "mutation": "Change the health response status or body.",
+      "result": "runs/<run-id>/negative-health.json"
+    },
+    {
+      "mutation_id": "drop-validation-error",
+      "expected_case": "create-missing-name",
+      "expected_operation": "POST-/users",
+      "mutation": "Remove the required-name validation response.",
+      "result": "runs/<run-id>/negative-validation.json"
+    }
+  ]
+}

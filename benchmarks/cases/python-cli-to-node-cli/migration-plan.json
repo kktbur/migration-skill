@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Node CLI skeleton and normal output",
+      "depends_on": [],
+      "required_cases": ["normal-json", "normal-text"],
+      "required_checks": ["target-tests"],
+      "scope": ["cli entrypoint", "JSON/text success output"],
+      "acceptance": ["normal JSON and text invocations pass parity"],
+      "rollback_boundary": "target checkpoint M1"
+    },
+    {
+      "id": "M2",
+      "name": "CLI error semantics",
+      "depends_on": ["M1"],
+      "required_cases": ["invalid-option", "missing-argument", "invalid-format"],
+      "required_checks": ["target-tests"],
+      "scope": ["argument validation", "exit code 2"],
+      "acceptance": ["M1 proof remains passing", "all declared error cases match"],
+      "rollback_boundary": "target checkpoint M2"
+    },
+    {
+      "id": "M3",
+      "name": "Boundary behavior and cleanup",
+      "depends_on": ["M2"],
+      "required_cases": ["empty-name", "unicode", "uppercase"],
+      "required_checks": ["target-tests"],
+      "scope": ["empty input", "Unicode", "uppercase option"],
+      "acceptance": ["M1 and M2 proof remains passing", "all boundary cases match"],
+      "rollback_boundary": "target checkpoint M3"
+    }
+  ]
+}

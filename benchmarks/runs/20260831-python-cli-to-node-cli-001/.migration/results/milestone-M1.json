@@ -1,0 +1,114 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [
+    "empty-name",
+    "invalid-format",
+    "invalid-option",
+    "missing-argument",
+    "unicode",
+    "uppercase"
+  ],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "normal JSON and text invocations pass parity"
+    ],
+    "depends_on": [],
+    "id": "M1",
+    "name": "Node CLI skeleton and normal output",
+    "required_cases": [
+      "normal-json",
+      "normal-text"
+    ],
+    "required_checks": [
+      "target-tests"
+    ],
+    "rollback_boundary": "target checkpoint M1",
+    "scope": [
+      "cli entrypoint",
+      "JSON/text success output"
+    ]
+  },
+  "milestone_id": "M1",
+  "plan_digest": "sha256:9824ad3ec06d9e78d36ad2fe3e03f6c3b8e1da4de05d1e544e919d6c09504325",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "normal-json",
+      "normal-text"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": []
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": [],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "normal-json",
+      "normal-text"
+    ],
+    "required": [
+      "normal-json",
+      "normal-text"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-tests"
+    ],
+    "required": [
+      "target-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": ".\\generated-target",
+    "tree_digest": "sha256:d487156eb52cf0760a35e38449872b8073cb187ab532903b27dd5e377833bfbb"
+  }
+}

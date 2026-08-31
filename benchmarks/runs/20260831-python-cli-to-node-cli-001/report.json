@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": "20260831-python-cli-to-node-cli-001",
+  "benchmark": "Python CLI -> Node CLI",
+  "case": "benchmarks/cases/python-cli-to-node-cli",
+  "source": {
+    "root": "source",
+    "revision": null,
+    "tree_digest": "sha256:94d3221c31ce88d7a74025604bd6b762d7c1ceaf7b20fd8c51a21f97ba5b08b9",
+    "loc": 99,
+    "read_only": true
+  },
+  "target": {
+    "root": "generated-target",
+    "revision": null,
+    "tree_digest": "sha256:5f1ac91d1c183104ce99d2a2a10a73b34e65465bf4400c1cb99ae938613a376e",
+    "loc": 98
+  },
+  "environment": {
+    "path": "environment.json",
+    "network_required": false,
+    "sandbox": "local fixture; no production or credential access"
+  },
+  "milestones": {
+    "planned": 3,
+    "accepted": ["M1", "M2", "M3"],
+    "repair_rounds": 2,
+    "manual_interventions": 0,
+    "token_usage": "unavailable",
+    "elapsed_time": "not instrumented in this run"
+  },
+  "verification": {
+    "freeze_manifest": ".migration/freeze-manifest.json",
+    "judge_validation": ".migration/judge-validation.json",
+    "baseline": ".migration/baseline.json",
+    "parity": {"passed": 8, "total": 8},
+    "source_regressions": [],
+    "final_verdict": "VERIFIED",
+    "migration_score": 1.0,
+    "result": ".migration/results/migration-result.json"
+  },
+  "negative_evidence": {
+    "broken_target": "broken-target",
+    "judge_result": ".migration/results/broken-target-judge-result.json",
+    "status": "failed",
+    "required_failed_cases": ["normal-json", "normal-text", "uppercase", "unicode"]
+  },
+  "observed_repairs": [
+    "Target test runner was made independent of the caller working directory.",
+    "Target adapter explicitly decodes Node stdout as UTF-8 for Windows parity execution."
+  ],
+  "replay": {
+    "prompt": "prompt.md",
+    "state": ".migration/state.json",
+    "source_checks": ".migration/results/source-checks.json",
+    "target_checks": ".migration/results/target-checks-m3.json",
+    "target_parity": ".migration/results/target-parity.json",
+    "parity_result": ".migration/results/parity-result.json",
+    "portable_freeze": true
+  }
+}

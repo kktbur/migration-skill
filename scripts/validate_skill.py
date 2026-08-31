@@ -19,6 +19,7 @@ EXPECTED_SCRIPTS = {
     "advance_milestone.py",
     "capture_baseline.py",
     "common.py",
+    "evaluate_milestone.py",
     "compare_results.py",
     "evaluate_migration.py",
     "freeze_contract.py",
@@ -27,6 +28,8 @@ EXPECTED_SCRIPTS = {
     "run_parity.py",
     "validate_contract.py",
     "validate_judge.py",
+    "validate_plan.py",
+    "verify_resume.py",
 }
 
 

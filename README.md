@@ -5,7 +5,7 @@ Migration Skill is a Codex-native, local-first protocol for behavior-preserving 
 It turns a migration request into an auditable sequence:
 
 ```text
-Discover → Contract → Judge → Freeze → Rewrite → Verify → Ratchet
+Discover → Contract → Judge → Freeze → Plan → Resume Preflight → Rewrite → Verify → Ratchet
 ```
 
 The project is intentionally not another `gpt-migrate` Agent Runtime. Codex supplies repository reading, cross-file reasoning, editing, command execution, build, test, and debugging. This package supplies the pieces that need to stay deterministic across sessions:
@@ -18,7 +18,11 @@ The project is intentionally not another `gpt-migrate` Agent Runtime. Codex supp
 - a frozen verifier bundle and source evidence digest;
 - adaptive completion gates and atomic milestone checkpoints.
 
-The current package is an alpha protocol implementation. It does not claim that an arbitrary repository can be migrated automatically or that a subprocess wrapper is a network sandbox.
+The current package is a v1.2 protocol implementation. It does not claim that an arbitrary repository can be migrated automatically or that a subprocess wrapper is a network sandbox.
+
+## Requirements
+
+Python 3.11 or newer is required. The deterministic helpers use the standard-library `tomllib` parser introduced in Python 3.11; the offline test path has no third-party Python dependency.
 
 ## Quick start
 
@@ -40,9 +44,11 @@ Use the `migration-skill` directory as a repository-scoped Codex Skill. The pack
      --corpus .migration/parity-corpus.json
    ```
 
-4. Capture the Source baseline and execute the Source/Target adapters with `run_parity.py`. Validate a positive Source Judge and targeted negative controls with `validate_judge.py`.
+4. Capture the Source baseline and execute the Source/Target adapters with `run_parity.py`. If a Contract contains placeholders such as `${PYTHON}`, pass them explicitly with `--var`; validate a positive Source Judge and targeted negative controls with `validate_judge.py`.
 
-5. Freeze the source evidence and complete verifier bundle, then let Codex migrate one bounded milestone at a time. Run `evaluate_migration.py` and accept a checkpoint only through `advance_milestone.py`.
+5. Freeze the source evidence and complete verifier bundle, then write `.migration/migration-plan.json` and validate it with `validate_plan.py`.
+
+6. Before every new edit, run `verify_resume.py`. After one bounded milestone, run `evaluate_milestone.py` and accept its proof set only through `advance_milestone.py`. Run the final `evaluate_migration.py` only after all milestones are complete.
 
 The full command sequence and recovery rules are in [`references/migration-workflow.md`](references/migration-workflow.md). Contract examples are in [`references/behavior-contract.md`](references/behavior-contract.md).
 
@@ -90,7 +96,7 @@ PLAN_ONLY
 INVALIDATED
 ```
 
-`VERIFIED` requires an intact freeze, no new Source regression, all configured required Target checks, all required parity cases, complete required operation coverage, a valid Judge, and no required gaps. Scores and percentages are informational only.
+`VERIFIED` requires an intact freeze, no new Source regression, all configured required Target checks, all required parity cases, complete required operation coverage, a valid Judge, all milestones in the validated plan, and no required gaps. Scores and percentages are informational only. A milestone can be eligible while future cases are missing; that intermediate result is not final `VERIFIED`.
 
 ## Repository layout
 
@@ -119,7 +125,7 @@ GitHub Actions runs these checks on both Ubuntu and Windows. Tests use `unittest
 
 ## Benchmarks and limits
 
-The benchmark plan covers Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM. The repository records benchmark fixtures and reporting requirements without claiming a `VERIFIED` migration until a complete Source → Judge → Target run has been reproduced and its artifacts are published. See [`benchmarks/README.md`](benchmarks/README.md).
+The benchmark plan covers Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM. Benchmark cases are blind: they publish Source, Contract, Corpus, plan, and mutation metadata but no pre-made Target. The first complete Python CLI → Node CLI run is published at [`benchmarks/runs/20260831-python-cli-to-node-cli-001/`](benchmarks/runs/20260831-python-cli-to-node-cli-001/) with a `VERIFIED` verdict and broken-Target rejection. See [`benchmarks/README.md`](benchmarks/README.md).
 
 Out of scope for v1 are production deployment, production database writes, cloud mutation, a GUI, a long-running Agent Runtime, a GitHub PR bot, automatic network isolation, arbitrary monorepo one-click migration, and in-place migration without a branch/worktree boundary.
 

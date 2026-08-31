@@ -1,0 +1,215 @@
+{
+  "adapter_protocol": "stdin-case-json-v1",
+  "cases": [
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.081893,
+      "id": "normal-json",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello Ada"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello Ada\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.079558,
+      "id": "normal-text",
+      "observed": {
+        "exit_code": 0,
+        "stdout": "hello Ada\n"
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": \"hello Ada\\n\"}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.080589,
+      "id": "uppercase",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello ADA"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello ADA\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.079362,
+      "id": "unicode",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello 张三"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello 张三\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.079093,
+      "id": "empty-name",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "name required"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"name required\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.080554,
+      "id": "invalid-option",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "invalid arguments"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"invalid arguments\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.079182,
+      "id": "missing-argument",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "name required"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"name required\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": ".\\source",
+      "duration_seconds": 0.079662,
+      "id": "invalid-format",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "format must be json or text"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"format must be json or text\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    }
+  ],
+  "profile": "source",
+  "root": ".\\source",
+  "schema_version": 2,
+  "status": "passed",
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 8,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 8
+  }
+}

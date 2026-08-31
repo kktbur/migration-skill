@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "cases": [
+    {"id": "default-greet", "surface_id": "package-api", "operation_id": "default-export", "input": {"action": "default", "args": ["Ada"]}, "required": true},
+    {"id": "named-add", "surface_id": "package-api", "operation_id": "named-export", "input": {"action": "add", "args": [2, 3]}, "required": true},
+    {"id": "empty-name-error", "surface_id": "package-api", "operation_id": "error-semantics", "input": {"action": "default", "args": [""]}, "required": true},
+    {"id": "invalid-add-error", "surface_id": "package-api", "operation_id": "error-semantics", "input": {"action": "add", "args": [2, "3"]}, "required": true}
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "source": {
+    "root": "source",
+    "revision": "AUTO",
+    "language": "Python",
+    "framework": "Flask",
+    "entrypoints": ["app.py"]
+  },
+  "target": {
+    "root": "generated-target",
+    "language": "Python",
+    "framework": "FastAPI",
+    "entrypoints": ["app.py"]
+  },
+  "public_surfaces": [
+    {
+      "id": "http-api",
+      "kind": "http",
+      "required": true,
+      "source_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "target_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "compare": {"whole": {"mode": "json-semantic"}},
+      "evidence": ["source/app.py", "source/adapter.py", "source/test_api.py"],
+      "confidence": "high",
+      "operations": [
+        {
+          "id": "GET-/health",
+          "required": true,
+          "description": "Return the service health JSON response.",
+          "evidence": [
+            {"path": "source/app.py", "type": "route-definition"},
+            {"path": "source/test_api.py", "type": "existing-test"}
+          ]
+        },
+        {
+          "id": "GET-/users/:id",
+          "required": true,
+          "description": "Look up a user and preserve the not-found status/body.",
+          "evidence": [
+            {"path": "source/app.py", "type": "route-definition"},
+            {"path": "source/test_api.py", "type": "existing-test"}
+          ]
+        },
+        {
+          "id": "POST-/users",
+          "required": true,
+          "description": "Create a user and preserve validation errors.",
+          "evidence": [
+            {"path": "source/app.py", "type": "route-definition"},
+            {"path": "source/test_api.py", "type": "existing-test"}
+          ]
+        }
+      ]
+    }
+  ],
+  "completion_gates": {"required_check_kinds": ["test"]},
+  "checks": {
+    "source": [
+      {
+        "id": "source-tests",
+        "kind": "test",
+        "argv": ["${PYTHON}", "-m", "unittest", "discover", "-s", ".", "-q"]
+      }
+    ],
+    "target": [
+      {
+        "id": "target-tests",
+        "kind": "test",
+        "argv": ["${PYTHON}", "-m", "unittest", "discover", "-s", ".", "-q"]
+      }
+    ]
+  },
+  "parity_corpus": "parity-corpus.json"
+}
