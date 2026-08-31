@@ -1,6 +1,6 @@
 # Migration workflow
 
-This reference describes the operational sequence behind `SKILL.md`. It is intentionally independent of a particular source or target language.
+This reference describes the operational sequence behind `SKILL.md`. It is independent of a particular source or target language.
 
 ## Phase 0: scope and workspace
 
@@ -10,7 +10,15 @@ Do not modify the original source. If source tests create tracked files, use a d
 
 ## Phase 1: inventory and readiness
 
-Run `inventory_project.py`. Then inspect the strongest evidence in this order:
+Run:
+
+```text
+python scripts/inventory_project.py --root SOURCE --output .migration/inventory.json
+```
+
+Inventory is read-only: it does not import the project, install dependencies, or access the network. It reports manifests, languages, entrypoints, tests, CI, documentation, OpenAPI/GraphQL/protobuf/schema evidence, candidate operations, public-surface signals, dependencies, and risks.
+
+Inspect the strongest evidence in this order:
 
 1. Existing public-surface, integration, E2E, and CI tests.
 2. HTTP routes, CLI parsers, exported APIs, file interfaces, and schemas.
@@ -19,47 +27,111 @@ Run `inventory_project.py`. Then inspect the strongest evidence in this order:
 
 Assess public-surface coverage, test reliability, external dependencies, databases, queues, WebSockets, OAuth, filesystem and process access, native dependencies, and network requirements. Use `HIGH` only when the source can be run and observed reliably. Use `MEDIUM` when a Judge can be built after additional harness work. Use `LOW` and `PLAN_ONLY` when observable behavior or safe execution cannot be established.
 
-## Phase 2: contract and corpus
+## Phase 2: Contract and Corpus
 
-`migration.json` states which externally observable behaviors are required. `parity-corpus.json` supplies concrete inputs for those behaviors. A contract can have many cases, and a case belongs to one declared surface.
+Create `.migration/migration.json` with schema version 2. Enumerate atomic operations below each public surface and attach path/type evidence to every required operation. Create `.migration/parity-corpus.json` with concrete inputs, one `operation_id` per case, and required/optional classification.
 
-The candidate contract is generated from evidence, then reviewed by the user or Codex. Once the source Judge passes and its negative control fails as expected, freeze the assets. After freeze, only adding a new source-passing case is allowed; additions require a new freeze.
+Validate before execution:
 
-## Phase 3: Judge validation
+```text
+python scripts/validate_contract.py \
+  --contract .migration/migration.json \
+  --corpus .migration/parity-corpus.json
+```
 
-Prefer a portable adapter over language-specific private-function tests. A good adapter produces stable exit codes, text, JSON, files, or snapshots and can run against both implementations.
+The Contract states invariants; the Corpus does not contain expected outputs or comparator rules.
 
-Run at least:
+## Phase 3: Source baseline and Judge
 
-- a happy-path case;
-- an error-path case;
-- a boundary case when one exists;
-- a deliberate mutation that changes status, output, exit code, or error behavior.
+Capture the Source baseline before accepting migration edits:
 
-The positive source run must pass. The negative control must fail. If the comparator passes both, stop with `PLAN_ONLY` and record `JUDGE_INVALID`.
+```text
+python scripts/capture_baseline.py \
+  --root SOURCE \
+  --spec .migration/migration.json \
+  --output .migration/baseline.json \
+  --profile source
+```
 
-## Phase 4: bounded migration
+Existing failing checks are recorded as inherited failures. Capture still succeeds by default; use `--strict` only when a caller explicitly wants a nonzero result for inherited failures. A timeout, command-not-found, execution error, or source change during capture is not an inherited failure and blocks reliable evidence.
+
+Run the same Corpus against Source:
+
+```text
+python scripts/run_parity.py --root SOURCE --contract .migration/migration.json \
+  --corpus .migration/parity-corpus.json --profile source \
+  --output .migration/results/source-parity.json
+```
+
+The positive Judge can compare Source against itself, or compare it with a separately portable expected artifact. Then create a mutation plan whose entries identify the required case each deliberate mutation must break. Run the mutated Source/Target adapter and compare it with:
+
+```text
+python scripts/compare_results.py --source source-parity.json --target mutated-parity.json \
+  --contract .migration/migration.json --corpus .migration/parity-corpus.json \
+  --manifest .migration/freeze-manifest.json --output negative-control.json \
+  --expect-mismatch --expect-case health
+```
+
+Before Freeze, the manifest does not exist yet; the first Judge comparison may use the public `compare` function or a temporary manifest generated after the positive control. The important property is that the negative control names a required case and actually fails that case.
+
+Validate the controls:
+
+```text
+python scripts/validate_judge.py --positive positive.json \
+  --mutation-plan mutation-plan.json --root SOURCE \
+  --output .migration/judge-validation.json
+```
+
+If the positive run does not pass or a targeted mutation is not detected, stop with `PLAN_ONLY` and record `JUDGE_INVALID`.
+
+## Phase 4: Freeze evidence
+
+Freeze the source revision/tree digest and the complete verifier bundle:
+
+```text
+python scripts/freeze_contract.py --root SOURCE \
+  --contract .migration/migration.json \
+  --corpus .migration/parity-corpus.json \
+  --evaluator scripts/evaluate_migration.py \
+  --judge-validation .migration/judge-validation.json \
+  --verifier-root scripts \
+  --output .migration/freeze-manifest.json
+```
+
+The frozen bundle includes `common.py`, `validate_contract.py`, `run_parity.py`, `compare_results.py`, `validate_judge.py`, `evaluate_migration.py`, and any other Python verifier helper under the chosen root. If the Source revision, tree digest, Contract, Corpus, Judge artifact, or verifier file set/hash changes, rerun Inventory, Baseline, Judge, and Freeze.
+
+## Phase 5: bounded migration
 
 Build a dependency-aware milestone list. Each milestone records an ID, scope, files or module boundary, prerequisites, expected behavior, checks, and rollback boundary. Choose a unit that can be verified in isolation; do not impose a universal layer order on every repository.
 
-Use Codex for semantic work: finding cross-file dependencies, mapping equivalent APIs, translating configuration, repairing compiler/test failures, and updating call sites. Keep deterministic tools for inventory, command execution, output comparison, and freeze integrity.
+Use Codex for semantic work: finding cross-file dependencies, mapping equivalent APIs, translating configuration, repairing compiler/test failures, and updating call sites. Keep deterministic tools for inventory, command execution, output comparison, freeze integrity, and verdicts.
 
-## Phase 5: ratchet and resume
+The default write boundary is:
 
-After each milestone:
+```text
+Source: read-only
+Target: sibling directory, worktree, or dedicated migration branch
+.migration/: evidence and state
+```
+
+## Phase 6: verification ratchet and resume
+
+After each bounded milestone:
 
 ```text
 edit target
-→ static checks
-→ build
+→ configured static checks
+→ build when configured
 → tests
 → required parity
-→ evaluate
-→ accept checkpoint or repair/reject
+→ evaluate_migration.py
+→ advance_milestone.py
 ```
 
-Write the accepted milestone and result paths to `state.json`. A resumed session must verify the freeze manifest before continuing.
+`evaluate_migration.py` gives the current deterministic result. `advance_milestone.py` is the state mutation boundary: it atomically writes `state.json` only when the result is ratchet-eligible and its score is not below the previous accepted checkpoint. Scores are informational and cannot override required gates.
 
-## Phase 6: handoff
+Persist accepted milestones and target tree digests in `.migration/state.json`. A resumed session must verify the Freeze and compare the current target revision/tree digest with the last accepted checkpoint. If the target changed outside the checkpoint, mark the state invalidated instead of guessing which edits survived.
 
-Write `migration-report.md` with the source revision, target path, accepted milestones, inherited failures, new regressions, required/optional parity counts, uncovered surfaces, sandbox requirements, known gaps, and the deterministic final state. Do not describe a partially verified result as complete.
+## Phase 7: handoff
+
+Write `.migration/migration-report.md` with the Source revision, target path, accepted milestones, inherited failures, new regressions, required/optional parity counts, operation coverage, sandbox requirements, known gaps, and the deterministic final state. Do not describe a partially verified result as complete.

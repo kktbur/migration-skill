@@ -19,6 +19,7 @@ try:
         now_environment_summary,
         run_check,
         summarize_results,
+        validate_variable_name,
         write_json,
     )
 except ImportError:  # pragma: no cover
@@ -32,6 +33,7 @@ except ImportError:  # pragma: no cover
         now_environment_summary,
         run_check,
         summarize_results,
+        validate_variable_name,
         write_json,
     )
 
@@ -42,8 +44,9 @@ def _variables(values: list[str] | None) -> dict[str, str]:
         if "=" not in item:
             raise ConfigError(f"--var 必须使用 KEY=VALUE: {item}")
         key, value = item.split("=", 1)
-        if not key or "\x00" in key or "\x00" in value:
+        if "\x00" in key or "\x00" in value:
             raise ConfigError(f"--var 的 KEY/VALUE 无效: {item}")
+        validate_variable_name(key, "--var")
         if key in result:
             raise ConfigError(f"--var 重复: {key}")
         result[key] = value
@@ -62,7 +65,15 @@ def run_checks(root: Path, spec: Any, profile: str, variables: dict[str, str], o
         if check_id in seen:
             raise ConfigError(f"选中的 checks 包含重复 id: {check_id}")
         seen.add(check_id)
-        results.append(run_check(root, check, variables, output_limit))
+        results.append(
+            run_check(
+                root,
+                check,
+                variables,
+                output_limit,
+                spec.get("environment") if isinstance(spec, dict) else None,
+            )
+        )
     summary = summarize_results(results)
     return {
         "schema_version": 1,
@@ -101,4 +112,3 @@ if __name__ == "__main__":
     except ConfigError as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(EXIT_INVALID)
-

@@ -3,22 +3,28 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT_ROOT = Path(__file__).resolve().parents[1] / "scripts"
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
+from advance_milestone import advance  # noqa: E402
 from capture_baseline import capture  # noqa: E402
 from common import (  # noqa: E402
     FrozenStateError,
+    _safe_env,
     compare_values,
     run_check,
     tree_digest,
+    validate_variable_name,
     verify_freeze,
     write_json,
 )
@@ -27,43 +33,53 @@ from evaluate_migration import _new_source_regressions, evaluate  # noqa: E402
 from freeze_contract import freeze  # noqa: E402
 from inventory_project import inventory  # noqa: E402
 from run_checks import run_checks  # noqa: E402
+from run_parity import run_parity  # noqa: E402
 from validate_contract import validate_documents  # noqa: E402
+from validate_judge import validate_artifact, validate_judge  # noqa: E402
 
 
 class MigrationScriptsTest(unittest.TestCase):
-    def _contract(self, source_checks=None, target_checks=None):
+    def _v2_contract(self, source_checks=None, target_checks=None):
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "source": {
                 "root": ".",
                 "revision": "AUTO",
                 "language": "Python",
-                "framework": "Flask",
-                "entrypoints": ["app.py"],
+                "framework": "CLI",
+                "entrypoints": ["cli.py"],
             },
             "target": {
                 "root": "../target",
-                "language": "Python",
-                "framework": "Flask-compatible fixture",
+                "language": "Node.js",
+                "framework": "CLI",
+                "entrypoints": ["cli.js"],
             },
+            "environment": {"set": {"NODE_ENV": "test"}},
             "public_surfaces": [
                 {
-                    "id": "main-http",
-                    "kind": "http",
+                    "id": "main-cli",
+                    "kind": "command",
                     "required": True,
                     "source_adapter": {
                         "kind": "harness",
-                        "argv": [sys.executable, "-c", "pass"],
+                        "argv": [sys.executable, "adapter.py"],
                     },
                     "target_adapter": {
                         "kind": "harness",
-                        "argv": [sys.executable, "-c", "pass"],
+                        "argv": [sys.executable, "adapter.py"],
                     },
-                    "compare": {"status": True, "body": "json-semantic"},
-                    "evidence": ["app.py"],
+                    "compare": {"whole": {"mode": "json-semantic"}},
+                    "evidence": ["cli.py", "adapter.py", "test_cli.py"],
                     "confidence": "high",
+                    "operations": [
+                        {"id": "hello", "required": True, "evidence": ["cli.py", "test_cli.py"]},
+                        {"id": "boundary-empty", "required": True, "evidence": ["cli.py"]},
+                        {"id": "error", "required": True, "evidence": ["cli.py", "test_cli.py"]},
+                    ],
                 }
             ],
+            "completion_gates": {"required_check_kinds": ["test"]},
             "checks": {
                 "source": source_checks or [],
                 "target": target_checks or [],
@@ -71,91 +87,172 @@ class MigrationScriptsTest(unittest.TestCase):
             "parity_corpus": "parity-corpus.json",
         }
 
-    def _corpus(self, cases=None):
-        if cases is None:
-            cases = [{
-            "id": "health",
-            "surface_id": "main-http",
-            "input": {"method": "GET", "path": "/health"},
-            "required": True,
-            }]
-        return {"schema_version": 1, "cases": cases}
-
-    def _quality_checks(self):
-        command = [sys.executable, "-c", "pass"]
-        return [
-            {"id": "source-static", "kind": "static", "argv": command},
-            {"id": "source-build", "kind": "build", "argv": command},
-            {"id": "source-test", "kind": "test", "argv": command},
-        ]
-
-    def _command_contract(self, source_checks, target_checks):
+    def _v2_corpus(self):
         return {
-            "schema_version": 1,
-            "source": {"root": ".", "revision": "AUTO", "language": "Python", "entrypoints": ["cli.py"]},
-            "target": {"root": "../target", "language": "Python", "entrypoints": ["cli.py"]},
-            "public_surfaces": [{
-                "id": "main-cli",
-                "kind": "command",
-                "required": True,
-                "source_adapter": {"kind": "harness", "argv": [sys.executable, "cli.py"]},
-                "target_adapter": {"kind": "harness", "argv": [sys.executable, "cli.py"]},
-                "compare": {"mode": "json-semantic"},
-                "evidence": ["cli.py", "test_cli.py"],
-                "confidence": "high",
-            }],
-            "checks": {"source": source_checks, "target": target_checks},
-            "parity_corpus": "parity-corpus.json",
+            "schema_version": 2,
+            "cases": [
+                {
+                    "id": "hello",
+                    "surface_id": "main-cli",
+                    "operation_id": "hello",
+                    "input": {"argv": ["--name", "Ada"]},
+                    "required": True,
+                },
+                {
+                    "id": "boundary-empty",
+                    "surface_id": "main-cli",
+                    "operation_id": "boundary-empty",
+                    "input": {"argv": ["--name", ""]},
+                    "required": True,
+                },
+                {
+                    "id": "error",
+                    "surface_id": "main-cli",
+                    "operation_id": "error",
+                    "input": {"argv": ["--unknown"]},
+                    "required": True,
+                },
+            ],
         }
 
-    def _fixture(self, empty_corpus=False):
-        temporary = tempfile.TemporaryDirectory()
-        base = Path(temporary.name)
+    def _checks(self):
+        source = [
+            {"id": "source-test", "kind": "test", "argv": [sys.executable, "-m", "unittest", "discover", "-s", ".", "-p", "test_cli.py"]}
+        ]
+        target = [dict(source[0], id="target-test")]
+        return source, target
+
+    def _write_cli_fixture(self, base: Path):
         source = base / "source"
         target = base / "target"
         source.mkdir()
         target.mkdir()
-        (source / "app.py").write_text("def health(): return {'ok': True}\n", encoding="utf-8")
-        (target / "app.py").write_text("def health(): return {'ok': True}\n", encoding="utf-8")
-        migration_dir = source / ".migration"
-        migration_dir.mkdir()
-        source_checks = self._quality_checks()
-        target_checks = [dict(item, id=item["id"].replace("source", "target")) for item in source_checks]
-        contract = self._contract(source_checks, target_checks)
-        corpus = self._corpus([] if empty_corpus else None)
-        contract_path = migration_dir / "migration.json"
-        corpus_path = migration_dir / "parity-corpus.json"
-        baseline_path = migration_dir / "baseline.json"
-        freeze_path = migration_dir / "freeze-manifest.json"
+        source_cli = (
+            "import json, sys\n"
+            "args = sys.argv[1:]\n"
+            "if len(args) == 2 and args[0] == '--name':\n"
+            "    if not args[1]:\n"
+            "        print(json.dumps({'error': 'name required'}, sort_keys=True))\n"
+            "        raise SystemExit(2)\n"
+            "    print(json.dumps({'greeting': 'hello ' + args[1]}, sort_keys=True))\n"
+            "    raise SystemExit(0)\n"
+            "print(json.dumps({'error': 'invalid arguments'}, sort_keys=True))\n"
+            "raise SystemExit(2)\n"
+        )
+        target_cli = (
+            "import json, sys\n"
+            "args = sys.argv[1:]\n"
+            "if len(args) == 2 and args[0] == '--name':\n"
+            "    if not args[1]:\n"
+            "        print(json.dumps({'error': 'name required'}, sort_keys=True))\n"
+            "        raise SystemExit(2)\n"
+            "    print(json.dumps({'greeting': 'hello ' + args[1]}, sort_keys=True))\n"
+            "    raise SystemExit(0)\n"
+            "print(json.dumps({'error': 'invalid arguments'}, sort_keys=True))\n"
+            "raise SystemExit(2)\n"
+        )
+        adapter = (
+            "import json, subprocess, sys\n"
+            "request = json.load(sys.stdin)\n"
+            "argv = request['input']['argv']\n"
+            "completed = subprocess.run([sys.executable, 'cli.py', *argv], capture_output=True, text=True, check=False)\n"
+            "try:\n"
+            "    output = json.loads(completed.stdout)\n"
+            "except json.JSONDecodeError:\n"
+            "    output = completed.stdout\n"
+            "print(json.dumps({'status': 'passed', 'observed': {'exit_code': completed.returncode, 'stdout': output}}, sort_keys=True))\n"
+        )
+        test_code = (
+            "import json, subprocess, sys, unittest\n"
+            "class TestCli(unittest.TestCase):\n"
+            "    def test_hello(self):\n"
+            "        result = subprocess.run([sys.executable, 'cli.py', '--name', 'Ada'], capture_output=True, text=True, check=False)\n"
+            "        self.assertEqual(result.returncode, 0)\n"
+            "        self.assertEqual(json.loads(result.stdout), {'greeting': 'hello Ada'})\n"
+            "if __name__ == '__main__': unittest.main()\n"
+        )
+        (source / "cli.py").write_text(source_cli, encoding="utf-8")
+        (target / "cli.py").write_text(target_cli, encoding="utf-8")
+        for root in (source, target):
+            (root / "adapter.py").write_text(adapter, encoding="utf-8")
+            (root / "test_cli.py").write_text(test_code, encoding="utf-8")
+        source_checks, target_checks = self._checks()
+        contract = self._v2_contract(source_checks, target_checks)
+        corpus = self._v2_corpus()
+        spec_dir = base / "spec"
+        spec_dir.mkdir()
+        contract_path = spec_dir / "migration.json"
+        corpus_path = spec_dir / "parity-corpus.json"
         write_json(contract_path, contract)
         write_json(corpus_path, corpus)
+        return source, target, contract, corpus, contract_path, corpus_path
+
+    def _prepare_frozen_fixture(self):
+        temporary = tempfile.TemporaryDirectory()
+        base = Path(temporary.name)
+        source, target, contract, corpus, contract_path, corpus_path = self._write_cli_fixture(base)
+        positive_path = base / "positive.json"
+        negative_path = base / "negative.json"
+        source_parity = run_parity(source, contract, corpus, "source")
+        positive = compare(source_parity, source_parity, contract, corpus)
+        write_json(positive_path, positive)
+        original_target = (target / "cli.py").read_text(encoding="utf-8")
+        (target / "cli.py").write_text(original_target.replace("'hello ' + args[1]", "'goodbye ' + args[1]"), encoding="utf-8")
+        negative_parity = run_parity(target, contract, corpus, "target")
+        negative = compare(
+            source_parity,
+            negative_parity,
+            contract,
+            corpus,
+            expect_mismatch=True,
+            expected_cases={"hello"},
+        )
+        write_json(negative_path, negative)
+        (target / "cli.py").write_text(original_target, encoding="utf-8")
+        plan_path = base / "mutation-plan.json"
+        write_json(
+            plan_path,
+            {
+                "schema_version": 1,
+                "negative_controls": [
+                    {
+                        "mutation_id": "change-greeting",
+                        "expected_case": "hello",
+                        "expected_operation": "hello",
+                        "result": "negative.json",
+                    }
+                ],
+            },
+        )
+        judge_path = base / "judge-validation.json"
+        judge = validate_judge(positive_path, plan_path, judge_path, source_root=source)
+        self.assertTrue(judge["valid"], judge)
+        manifest_path = base / "freeze-manifest.json"
+        manifest = freeze(
+            source,
+            contract_path,
+            corpus_path,
+            SCRIPT_ROOT / "evaluate_migration.py",
+            manifest_path,
+            judge_path,
+            SCRIPT_ROOT,
+        )
         baseline = capture(source, contract, "source")
-        write_json(baseline_path, baseline)
-        evaluator_path = SCRIPT_ROOT / "evaluate_migration.py"
-        manifest = freeze(source, contract_path, corpus_path, evaluator_path, freeze_path)
-        source_checks_result = run_checks(source, contract, "source", {}, 20000)
-        target_checks_result = run_checks(target, contract, "target", {}, 20000)
-        source_parity = {
-            "cases": [{
-                "id": "health",
-                "surface_id": "main-http",
-                "status": "passed",
-                "observed": {"status": 200, "body": {"ok": True}},
-            }]
-            if not empty_corpus else []
-        }
-        target_parity = json.loads(json.dumps(source_parity))
+        source_checks = run_checks(source, contract, "source", {}, 20000)
+        target_checks = run_checks(target, contract, "target", {}, 20000)
+        target_parity = run_parity(target, contract, corpus, "target")
         parity = compare(source_parity, target_parity, contract, corpus)
         state = {
             "source_revision": manifest["source"]["revision"],
-            "current_milestone": "M002",
-            "completed_milestones": ["M001"],
-            "last_accepted_checkpoint": "checkpoint-M001",
-            "judge": {"positive_control": True, "negative_control": True},
+            "current_milestone": "M001",
+            "completed_milestones": [],
+            "last_accepted_checkpoint": None,
             "required_gaps": [],
         }
+        freeze_result = {"intact": True, "manifest": manifest}
         return {
             "temporary": temporary,
+            "base": base,
             "source": source,
             "target": target,
             "contract": contract,
@@ -164,63 +261,94 @@ class MigrationScriptsTest(unittest.TestCase):
             "corpus_path": corpus_path,
             "baseline": baseline,
             "manifest": manifest,
-            "freeze_path": freeze_path,
-            "freeze": {"intact": True, "manifest": manifest},
-            "source_checks": source_checks_result,
-            "target_checks": target_checks_result,
+            "manifest_path": manifest_path,
+            "judge_path": judge_path,
+            "source_checks": source_checks,
+            "target_checks": target_checks,
             "parity": parity,
             "state": state,
+            "freeze": freeze_result,
         }
 
-    def test_inventory_is_read_only_and_ignores_generated_dirs(self):
+    def test_environment_is_minimal_and_explicit_nonsecret_values_work(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "do-not-leak", "NODE_ENV": "parent"}, clear=False):
+            environment = _safe_env()
+            self.assertNotIn("OPENAI_API_KEY", environment)
+            self.assertNotIn("GITHUB_TOKEN", environment)
+            self.assertIn("PATH", {key.upper() for key in environment})
+            self.assertEqual(_safe_env({"inherit": ["NODE_ENV"]})["NODE_ENV"], "parent")
+            self.assertEqual(_safe_env({"set": {"NODE_ENV": "test"}})["NODE_ENV"], "test")
+            with self.assertRaises(ValueError):
+                _safe_env({"inherit": ["AWS_SECRET_ACCESS_KEY"]})
+            with self.assertRaises(ValueError):
+                validate_variable_name("OPENAI_API_KEY", "--var")
+
+            with tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                result = run_check(
+                    root,
+                    {
+                        "id": "env",
+                        "argv": [sys.executable, "-c", "import os; print(os.environ.get('OPENAI_API_KEY', 'missing'))"],
+                    },
+                )
+                self.assertEqual(result["status"], "passed")
+                self.assertEqual(result["stdout"].strip(), "missing")
+
+    def test_tree_digest_ignores_secret_files_and_streams_generic_tree(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            (root / ".git").mkdir()
-            (root / "node_modules").mkdir()
-            (root / "dist").mkdir()
-            (root / ".migration").mkdir()
-            (root / ".git" / "ignored.py").write_text("x", encoding="utf-8")
-            (root / "node_modules" / "ignored.js").write_text("x", encoding="utf-8")
-            (root / "dist" / "ignored.js").write_text("x", encoding="utf-8")
-            (root / ".migration" / "ignored.json").write_text("{}", encoding="utf-8")
-            (root / "package.json").write_text(
-                '{"dependencies":{"express":"1"},"scripts":{"build":"x","test":"x"}}',
-                encoding="utf-8",
-            )
-            (root / "app.py").write_text("from flask import Flask\n@app.get('/health')\ndef health(): pass\n", encoding="utf-8")
-            (root / "test_app.py").write_text("def test_health(): pass\n", encoding="utf-8")
-            (root / ".github" / "workflows").mkdir(parents=True)
-            (root / ".github" / "workflows" / "ci.yml").write_text("name: ci", encoding="utf-8")
+            (root / "app.py").write_text("print('ok')\n", encoding="utf-8")
+            (root / ".env").write_text("OPENAI_API_KEY=secret-one\n", encoding="utf-8")
+            (root / "credentials.json").write_text('{"token":"secret-one"}\n', encoding="utf-8")
+            (root / "cert.pem").write_text("secret-one\n", encoding="utf-8")
             before = tree_digest(root)
+            (root / ".env").write_text("OPENAI_API_KEY=secret-two\n", encoding="utf-8")
+            (root / "credentials.json").write_text('{"token":"secret-two"}\n', encoding="utf-8")
+            (root / "cert.pem").write_text("secret-two\n", encoding="utf-8")
+            self.assertEqual(before, tree_digest(root))
+
+    def test_inventory_detects_docs_schema_pyproject_and_operations(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "app.py").write_text("from flask import Flask\n@app.get('/health')\ndef health(): pass\n", encoding="utf-8")
+            (root / "README.md").write_text("GET /health\n", encoding="utf-8")
+            (root / "openapi.yaml").write_text("paths:\n  /health:\n    get:\n      responses: {}\n", encoding="utf-8")
+            (root / "schema.graphql").write_text("type Query { health: Boolean }\n", encoding="utf-8")
+            (root / "service.proto").write_text("service API { rpc Health (Request) returns (Response); }\n", encoding="utf-8")
+            (root / "pyproject.toml").write_text("[project.scripts]\nhello = 'pkg.cli:main'\n", encoding="utf-8")
             report = inventory(root)
-            after = tree_digest(root)
-            self.assertEqual(before, after)
-            self.assertEqual(report["files"]["total"], 4)
-            self.assertIn("Python", {item["name"] for item in report["languages"]})
-            self.assertEqual(report["manifests"][0]["path"], "package.json")
-            self.assertIn("app.py", report["entrypoints"])
-            self.assertIn(".github/workflows/ci.yml", report["ci"])
-            self.assertTrue(report["possible_public_surfaces"])
+            self.assertIn("README.md", report["documentation"])
+            self.assertIn("openapi.yaml", report["schemas"])
+            self.assertIn("pkg.cli", report["entrypoints"])
+            operation_ids = {item["id"] for item in report["candidate_operations"]}
+            self.assertIn("GET-/health", operation_ids)
+            self.assertIn("PATH-/health", operation_ids)
+            self.assertTrue(any(item["id"] == "script:hello" for item in report["candidate_operations"]))
 
-    def test_contract_validation_valid_and_invalid_inputs(self):
-        contract = self._contract()
-        corpus = self._corpus()
-        self.assertEqual(validate_documents(contract, corpus), [])
-
-        duplicate = json.loads(json.dumps(contract))
-        duplicate["public_surfaces"].append(json.loads(json.dumps(duplicate["public_surfaces"][0])))
-        self.assertTrue(any("重复 id" in error for error in validate_documents(duplicate, corpus)))
-
-        invalid_surface = json.loads(json.dumps(contract))
-        invalid_surface["public_surfaces"][0]["kind"] = "unknown"
-        self.assertTrue(validate_documents(invalid_surface, corpus))
-
-        invalid_argv = json.loads(json.dumps(contract))
-        invalid_argv["public_surfaces"][0]["source_adapter"]["argv"] = "python -c pass"
-        self.assertTrue(any("argv" in error for error in validate_documents(invalid_argv, corpus)))
-
-        invalid_case = self._corpus([{"id": "missing-input", "surface_id": "main-http"}])
-        self.assertTrue(any("缺少 input" in error for error in validate_documents(contract, invalid_case)))
+    def test_contract_validation_v2_operations_environment_and_invalid_inputs(self):
+        source, target, contract, corpus, _, _ = self._write_cli_fixture(Path(tempfile.mkdtemp()))
+        try:
+            self.assertEqual(validate_documents(contract, corpus), [])
+            duplicate = json.loads(json.dumps(contract))
+            duplicate["public_surfaces"][0]["operations"].append(
+                json.loads(json.dumps(duplicate["public_surfaces"][0]["operations"][0]))
+            )
+            self.assertTrue(any("重复" in error for error in validate_documents(duplicate, corpus)))
+            missing_operation_case = json.loads(json.dumps(corpus))
+            missing_operation_case["cases"] = missing_operation_case["cases"][:1]
+            self.assertTrue(any("required operation" in error for error in validate_documents(contract, missing_operation_case)))
+            invalid_compare = json.loads(json.dumps(contract))
+            invalid_compare["public_surfaces"][0]["compare"] = {"mode": "json-semantic"}
+            self.assertTrue(validate_documents(invalid_compare, corpus))
+            invalid_env = json.loads(json.dumps(contract))
+            invalid_env["environment"] = {"inherit": ["OPENAI_API_KEY"]}
+            self.assertTrue(any("Secret" in error for error in validate_documents(invalid_env, corpus)))
+            invalid_argv = json.loads(json.dumps(contract))
+            invalid_argv["public_surfaces"][0]["source_adapter"]["argv"] = "python adapter.py"
+            self.assertTrue(any("argv" in error for error in validate_documents(invalid_argv, corpus)))
+        finally:
+            shutil.rmtree(source.parent, ignore_errors=True)
 
     def test_run_checks_success_failure_timeout_and_output_limit(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -229,7 +357,7 @@ class MigrationScriptsTest(unittest.TestCase):
                 "checks": [
                     {"id": "pass", "kind": "test", "argv": [sys.executable, "-c", "print('ok')"]},
                     {"id": "failure", "kind": "test", "required": False, "argv": [sys.executable, "-c", "raise SystemExit(3)"]},
-                    {"id": "large", "kind": "static", "argv": [sys.executable, "-c", "print('x' * 100)"]},
+                    {"id": "large", "kind": "static", "argv": [sys.executable, "-c", "print('x' * 100)" ]},
                 ]
             }
             report = run_checks(root, spec, "source", {}, 10)
@@ -243,101 +371,129 @@ class MigrationScriptsTest(unittest.TestCase):
                 {"id": "timeout", "argv": [sys.executable, "-c", "import time; time.sleep(0.4)"], "timeout_seconds": 0.05},
             )
             self.assertEqual(timeout["status"], "timeout")
+            baseline = capture(
+                root,
+                {"checks": [{"id": "timeout", "kind": "test", "argv": [sys.executable, "-c", "import time; time.sleep(0.4)"], "timeout_seconds": 0.05}]},
+                "source",
+            )
+            self.assertEqual(baseline["status"], "capture_failed")
 
-    def test_comparators_normalize_text_and_json_semantics(self):
+    def test_comparators_apply_normalization_and_preserve_json_types(self):
+        self.assertTrue(compare_values("a\r\nb  \r\n", "a\nb\n", "exact", ["crlf-to-lf", "trim-trailing-whitespace"]))
         self.assertTrue(compare_values("a\r\nb  \r\n", "a\nb\n", "text-normalized"))
         self.assertTrue(compare_values('{"b": 2, "a": 1}', {"a": 1, "b": 2}, "json-semantic"))
         self.assertFalse(compare_values({"a": 1}, {"a": "1"}, "json-semantic"))
+        self.assertFalse(compare_values({"a": None}, {}, "json-semantic"))
 
-    def test_parity_missing_required_case_and_negative_control(self):
-        contract = self._contract()
-        corpus = self._corpus()
-        source = {"cases": [{"id": "health", "status": "passed", "observed": {"status": 200, "body": {"ok": True}}}]}
-        missing_target = {"cases": []}
-        result = compare(source, missing_target, contract, corpus)
-        self.assertEqual(result["status"], "failed")
-        self.assertEqual(result["summary"]["required_failed"], ["health"])
-        broken_target = {"cases": [{"id": "health", "status": "passed", "observed": {"status": 500, "body": {"ok": False}}}]}
-        negative = compare(source, broken_target, contract, corpus, expect_mismatch=True)
-        self.assertEqual(negative["status"], "negative_control_passed")
+    def test_parity_runner_and_targeted_negative_control(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            source, target, contract, corpus, _, _ = self._write_cli_fixture(base)
+            source_result = run_parity(source, contract, corpus, "source")
+            target_result = run_parity(target, contract, corpus, "target")
+            self.assertEqual(source_result["status"], "passed")
+            self.assertEqual(target_result["status"], "passed")
+            self.assertEqual(source_result["summary"]["passed"], 3)
+            original = (target / "cli.py").read_text(encoding="utf-8")
+            (target / "cli.py").write_text(original.replace("'hello ' + args[1]", "'goodbye ' + args[1]"), encoding="utf-8")
+            broken = run_parity(target, contract, corpus, "target")
+            negative = compare(source_result, broken, contract, corpus, expect_mismatch=True, expected_cases={"hello"})
+            self.assertEqual(negative["status"], "negative_control_passed")
+            self.assertEqual(negative["summary"]["detected_mismatch_cases"], ["hello"])
 
-    def test_freeze_detects_contract_and_evaluator_tampering(self):
-        fixture = self._fixture()
+    def test_validate_judge_rejects_fake_or_unscoped_negative_control(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            positive = base / "positive.json"
+            negative = base / "negative.json"
+            plan = base / "plan.json"
+            output = base / "judge.json"
+            write_json(positive, {"status": "passed", "passed": True, "summary": {"required_failed": []}, "cases": []})
+            write_json(
+                negative,
+                {
+                    "status": "negative_control_passed",
+                    "passed": True,
+                    "negative_control": True,
+                    "negative_control_scoped": False,
+                    "cases": [{"id": "health", "required": True, "passed": False}],
+                },
+            )
+            write_json(
+                plan,
+                {
+                    "schema_version": 1,
+                    "negative_controls": [{"mutation_id": "bad", "expected_case": "health", "result": "negative.json"}],
+                },
+            )
+            artifact = validate_judge(positive, plan, output)
+            self.assertFalse(artifact["valid"])
+            self.assertTrue(any(item["reason"] == "negative-control-is-not-scoped" for item in artifact["negative_controls"]))
+            self.assertTrue(validate_artifact(artifact))
+
+    def test_freeze_validates_judge_and_entire_verifier_bundle(self):
+        fixture = self._prepare_frozen_fixture()
         try:
-            self.assertTrue(verify_freeze(fixture["freeze_path"])["intact"])
-            tampered = dict(fixture["contract"])
-            tampered["target"] = dict(tampered["target"], framework="tampered")
-            write_json(fixture["contract_path"], tampered)
+            self.assertTrue(verify_freeze(fixture["manifest_path"])["intact"])
             with self.assertRaises(FrozenStateError):
-                verify_freeze(fixture["freeze_path"])
+                tampered = json.loads(fixture["contract_path"].read_text(encoding="utf-8"))
+                tampered["target"]["framework"] = "tampered"
+                write_json(fixture["contract_path"], tampered)
+                verify_freeze(fixture["manifest_path"])
         finally:
             fixture["temporary"].cleanup()
 
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)
+            verifier = base / "verifier"
+            shutil.copytree(SCRIPT_ROOT, verifier)
             source = base / "source"
             source.mkdir()
+            contract = self._v2_contract([], [])
+            corpus = self._v2_corpus()
             contract_path = base / "migration.json"
             corpus_path = base / "parity-corpus.json"
-            evaluator_path = base / "evaluate.py"
+            judge_path = base / "judge.json"
             manifest_path = base / "freeze.json"
-            write_json(contract_path, self._contract())
-            write_json(corpus_path, self._corpus())
-            evaluator_path.write_text("print('original')\n", encoding="utf-8")
-            freeze(source, contract_path, corpus_path, evaluator_path, manifest_path)
-            evaluator_path.write_text("print('mutated')\n", encoding="utf-8")
+            write_json(contract_path, contract)
+            write_json(corpus_path, corpus)
+            write_json(
+                judge_path,
+                {
+                    "schema_version": 1,
+                    "artifact_type": "judge-validation-v1",
+                    "generated_by": "validate_judge.py",
+                    "positive_control": True,
+                    "negative_controls": [{"mutation_id": "m", "expected_case": "x", "result_sha256": "sha256:x", "detected": True}],
+                    "negative_control": True,
+                    "valid": True,
+                },
+            )
+            freeze(source, contract_path, corpus_path, verifier / "evaluate_migration.py", manifest_path, judge_path, verifier)
+            (verifier / "common.py").write_text("tampered\n", encoding="utf-8")
             with self.assertRaises(FrozenStateError):
                 verify_freeze(manifest_path)
 
+    def test_baseline_inherited_failure_is_capture_success_and_strict_is_failure(self):
         with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary)
-            source = base / "source"
-            source.mkdir()
-            (source / "app.py").write_text("original\n", encoding="utf-8")
-            try:
-                subprocess.run(["git", "init", "-q"], cwd=str(source), check=True)
-                subprocess.run(["git", "add", "app.py"], cwd=str(source), check=True)
-                subprocess.run(
-                    ["git", "-c", "user.name=Migration Test", "-c", "user.email=migration@example.invalid", "commit", "-qm", "initial"],
-                    cwd=str(source),
-                    check=True,
-                )
-            except (OSError, subprocess.CalledProcessError):
-                self.skipTest("git is unavailable for revision freeze test")
-            contract_path = base / "migration.json"
-            corpus_path = base / "parity-corpus.json"
-            evaluator_path = base / "evaluate.py"
-            manifest_path = base / "freeze.json"
-            write_json(contract_path, self._contract())
-            write_json(corpus_path, self._corpus())
-            evaluator_path.write_text("print('original')\n", encoding="utf-8")
-            freeze(source, contract_path, corpus_path, evaluator_path, manifest_path)
-            (source / "app.py").write_text("changed\n", encoding="utf-8")
-            subprocess.run(["git", "add", "app.py"], cwd=str(source), check=True)
-            subprocess.run(
-                ["git", "-c", "user.name=Migration Test", "-c", "user.email=migration@example.invalid", "commit", "-qm", "changed"],
-                cwd=str(source),
-                check=True,
-            )
-            (source / "app.py").write_text("original\n", encoding="utf-8")
-            with self.assertRaises(FrozenStateError):
-                verify_freeze(manifest_path)
+            root = Path(temporary)
+            spec = {"checks": [{"id": "inherited", "kind": "test", "argv": [sys.executable, "-c", "raise SystemExit(3)"]}]}
+            report = capture(root, spec, "source")
+            self.assertEqual(report["status"], "captured_with_inherited_failures")
+            self.assertEqual(report["inherited_failures"], ["inherited"])
 
     def test_inherited_failure_is_not_new_regression_but_new_failure_is(self):
-        baseline = {"checks": [
-            {"id": "inherited", "status": "failed"},
-            {"id": "stable", "status": "passed"},
-        ], "inherited_failures": ["inherited"]}
-        current = {"checks": [
-            {"id": "inherited", "status": "failed"},
-            {"id": "stable", "status": "passed"},
-        ]}
+        baseline = {
+            "checks": [{"id": "inherited", "status": "failed"}, {"id": "stable", "status": "passed"}],
+            "inherited_failures": ["inherited"],
+        }
+        current = {"checks": [{"id": "inherited", "status": "failed"}, {"id": "stable", "status": "passed"}]}
         self.assertEqual(_new_source_regressions(baseline, current), [])
         current["checks"][1]["status"] = "failed"
         self.assertEqual(_new_source_regressions(baseline, current), ["stable"])
 
-    def test_evaluator_verified_and_resume_state(self):
-        fixture = self._fixture()
+    def test_evaluator_adaptive_gates_operation_coverage_and_resume(self):
+        fixture = self._prepare_frozen_fixture()
         try:
             report = evaluate(
                 fixture["baseline"],
@@ -350,33 +506,22 @@ class MigrationScriptsTest(unittest.TestCase):
                 fixture["freeze"],
             )
             self.assertEqual(report["status"], "VERIFIED")
-            self.assertEqual(report["resume"]["current_milestone"], "M002")
-            self.assertEqual(report["inherited_failures"], [])
-            self.assertTrue(report["score_is_informational_only"])
-            invalid_judge_state = json.loads(json.dumps(fixture["state"]))
-            invalid_judge_state["judge"]["negative_control"] = False
-            invalid_judge_report = evaluate(
-                fixture["baseline"],
-                fixture["source_checks"],
-                fixture["target_checks"],
-                fixture["parity"],
-                fixture["contract"],
-                fixture["corpus"],
-                invalid_judge_state,
-                fixture["freeze"],
-            )
-            self.assertEqual(invalid_judge_report["status"], "PLAN_ONLY")
+            self.assertTrue(report["parity"]["coverage"]["all_required_operations_covered"])
+            self.assertFalse(report["target"]["quality_gates"]["static"]["required"])
+            self.assertTrue(report["ratchet_eligible"])
+            rejected_contract = json.loads(json.dumps(fixture["contract"]))
+            rejected_contract["public_surfaces"][0]["operations"] = rejected_contract["public_surfaces"][0]["operations"][:1]
+            rejected_corpus = json.loads(json.dumps(fixture["corpus"]))
+            self.assertTrue(validate_documents(rejected_contract, rejected_corpus))
         finally:
             fixture["temporary"].cleanup()
 
-    def test_evaluator_rejects_new_regression_and_unknown_required_surface(self):
-        fixture = self._fixture()
+    def test_advance_milestone_is_atomic_and_resume_detects_target_change(self):
+        fixture = self._prepare_frozen_fixture()
         try:
-            source_checks = json.loads(json.dumps(fixture["source_checks"]))
-            source_checks["results"][1]["status"] = "failed"
-            report = evaluate(
+            result = evaluate(
                 fixture["baseline"],
-                source_checks,
+                fixture["source_checks"],
                 fixture["target_checks"],
                 fixture["parity"],
                 fixture["contract"],
@@ -384,240 +529,45 @@ class MigrationScriptsTest(unittest.TestCase):
                 fixture["state"],
                 fixture["freeze"],
             )
-            self.assertEqual(report["status"], "BLOCKED")
-            self.assertTrue(report["source_baseline_regressed"])
+            result_path = fixture["base"] / "migration-result.json"
+            state_path = fixture["base"] / "state.json"
+            write_json(result_path, result)
+            write_json(state_path, fixture["state"])
+            checkpoint = advance(state_path, result_path, "M001", fixture["target"])
+            self.assertEqual(checkpoint["status"], "accepted")
+            accepted_state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertEqual(accepted_state["completed_milestones"], ["M001"])
+            resumed_report = evaluate(
+                fixture["baseline"],
+                fixture["source_checks"],
+                fixture["target_checks"],
+                fixture["parity"],
+                fixture["contract"],
+                fixture["corpus"],
+                accepted_state,
+                fixture["freeze"],
+            )
+            self.assertEqual(resumed_report["resume"]["checkpoint_validation"]["status"], "verified")
+            before = state_path.read_text(encoding="utf-8")
+            rejected_result = dict(result, ratchet_eligible=False)
+            write_json(result_path, rejected_result)
+            rejected = advance(state_path, result_path, "M002", fixture["target"])
+            self.assertEqual(rejected["status"], "rejected")
+            self.assertEqual(before, state_path.read_text(encoding="utf-8"))
+            (fixture["target"] / "cli.py").write_text("changed\n", encoding="utf-8")
+            invalidated = evaluate(
+                fixture["baseline"],
+                fixture["source_checks"],
+                fixture["target_checks"],
+                fixture["parity"],
+                fixture["contract"],
+                fixture["corpus"],
+                accepted_state,
+                fixture["freeze"],
+            )
+            self.assertEqual(invalidated["status"], "INVALIDATED")
         finally:
             fixture["temporary"].cleanup()
-
-        empty_fixture = self._fixture(empty_corpus=True)
-        try:
-            report = evaluate(
-                empty_fixture["baseline"],
-                empty_fixture["source_checks"],
-                empty_fixture["target_checks"],
-                empty_fixture["parity"],
-                empty_fixture["contract"],
-                empty_fixture["corpus"],
-                empty_fixture["state"],
-                empty_fixture["freeze"],
-            )
-            self.assertNotEqual(report["status"], "VERIFIED")
-            self.assertFalse(report["parity"]["coverage"]["all_required_surfaces_covered"])
-        finally:
-            empty_fixture["temporary"].cleanup()
-
-    def test_cli_forward_run_completes_and_negative_control_fails(self):
-        """Exercise the public CLIs in the same order a Codex task would use."""
-        with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary)
-            source = base / "source"
-            target = base / "target"
-            source.mkdir()
-            target.mkdir()
-            cli_code = (
-                "import json, sys\n"
-                "args = sys.argv[1:]\n"
-                "if len(args) == 2 and args[0] == '--name':\n"
-                "    if not args[1]:\n"
-                "        print(json.dumps({'error': 'name required'}, sort_keys=True))\n"
-                "        raise SystemExit(2)\n"
-                "    print(json.dumps({'greeting': 'hello ' + args[1]}, sort_keys=True))\n"
-                "    raise SystemExit(0)\n"
-                "print(json.dumps({'error': 'invalid arguments'}, sort_keys=True))\n"
-                "raise SystemExit(2)\n"
-            )
-            test_code = (
-                "import json, subprocess, sys, unittest\n"
-                "class TestCli(unittest.TestCase):\n"
-                "    def test_hello(self):\n"
-                "        result = subprocess.run([sys.executable, 'cli.py', '--name', 'Ada'], capture_output=True, text=True, check=False)\n"
-                "        self.assertEqual(result.returncode, 0)\n"
-                "        self.assertEqual(json.loads(result.stdout), {'greeting': 'hello Ada'})\n"
-                "if __name__ == '__main__': unittest.main()\n"
-            )
-            (source / "cli.py").write_text(cli_code, encoding="utf-8")
-            (target / "cli.py").write_text(cli_code, encoding="utf-8")
-            (source / "test_cli.py").write_text(test_code, encoding="utf-8")
-            (target / "test_cli.py").write_text(test_code, encoding="utf-8")
-            migration = source / ".migration"
-            migration.mkdir()
-            contract_path = migration / "migration.json"
-            corpus_path = migration / "parity-corpus.json"
-            inventory_path = migration / "inventory.json"
-            baseline_path = migration / "baseline.json"
-            manifest_path = migration / "freeze-manifest.json"
-            source_checks_path = migration / "source-checks.json"
-            target_checks_path = migration / "target-checks.json"
-            source_parity_path = migration / "source-parity.json"
-            target_parity_path = migration / "target-parity.json"
-            parity_path = migration / "parity-result.json"
-            state_path = migration / "state.json"
-            result_path = migration / "migration-result.json"
-            judge_path = migration / "judge-validation.json"
-            checks = [
-                {"id": "source-static", "kind": "static", "argv": [sys.executable, "-m", "py_compile", "cli.py"]},
-                {"id": "source-build", "kind": "build", "argv": [sys.executable, "-m", "py_compile", "cli.py"]},
-                {"id": "source-test", "kind": "test", "argv": [sys.executable, "-m", "unittest", "discover", "-s", ".", "-p", "test_cli.py"]},
-            ]
-            target_checks = [dict(item, id=item["id"].replace("source", "target")) for item in checks]
-            contract = self._command_contract(checks, target_checks)
-            corpus = {
-                "schema_version": 1,
-                "cases": [
-                    {"id": "hello", "surface_id": "main-cli", "input": {"argv": ["--name", "Ada"]}, "required": True},
-                    {"id": "boundary-empty", "surface_id": "main-cli", "input": {"argv": ["--name", ""]}, "required": True},
-                    {"id": "error", "surface_id": "main-cli", "input": {"argv": ["--unknown"]}, "required": True},
-                ],
-            }
-            write_json(contract_path, contract)
-            write_json(corpus_path, corpus)
-            write_json(judge_path, {"positive_control": True, "negative_control": True})
-
-            def cli(script_name, *arguments):
-                completed = subprocess.run(
-                    [sys.executable, str(SCRIPT_ROOT / script_name), *map(str, arguments)],
-                    cwd=str(SCRIPT_ROOT.parent),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    encoding="utf-8",
-                    errors="replace",
-                    check=False,
-                )
-                self.assertEqual(
-                    completed.returncode,
-                    0,
-                    f"{script_name} failed\nstdout={completed.stdout}\nstderr={completed.stderr}",
-                )
-                return completed
-
-            cli("inventory_project.py", "--root", source, "--output", inventory_path)
-            cli("validate_contract.py", "--contract", contract_path, "--corpus", corpus_path)
-            cli("capture_baseline.py", "--root", source, "--spec", contract_path, "--output", baseline_path)
-            cli(
-                "freeze_contract.py",
-                "--root",
-                source,
-                "--contract",
-                contract_path,
-                "--corpus",
-                corpus_path,
-                "--evaluator",
-                SCRIPT_ROOT / "evaluate_migration.py",
-                "--judge-validation",
-                judge_path,
-                "--output",
-                manifest_path,
-            )
-            cli("run_checks.py", "--root", source, "--spec", contract_path, "--profile", "source", "--output", source_checks_path)
-            cli("run_checks.py", "--root", target, "--spec", contract_path, "--profile", "target", "--output", target_checks_path)
-
-            def run_adapter(root):
-                results = []
-                for case in corpus["cases"]:
-                    completed = subprocess.run(
-                        [sys.executable, "cli.py", *case["input"]["argv"]],
-                        cwd=str(root),
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        text=True,
-                        encoding="utf-8",
-                        errors="replace",
-                        check=False,
-                    )
-                    results.append({
-                        "id": case["id"],
-                        "surface_id": case["surface_id"],
-                        "status": "passed",
-                        "observed": {
-                            "exit_code": completed.returncode,
-                            "stdout": json.loads(completed.stdout),
-                        },
-                    })
-                return {"cases": results}
-
-            parity_cases = run_adapter(source)["cases"]
-            write_json(source_parity_path, {"cases": parity_cases})
-            write_json(target_parity_path, run_adapter(target))
-            cli(
-                "compare_results.py",
-                "--source",
-                source_parity_path,
-                "--target",
-                target_parity_path,
-                "--contract",
-                contract_path,
-                "--corpus",
-                corpus_path,
-                "--manifest",
-                manifest_path,
-                "--output",
-                parity_path,
-            )
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            write_json(
-                state_path,
-                {
-                    "source_revision": manifest["source"]["revision"],
-                    "current_milestone": "M001",
-                    "completed_milestones": [],
-                    "last_accepted_checkpoint": None,
-                    "judge": {"positive_control": True, "negative_control": True},
-                    "required_gaps": [],
-                },
-            )
-            cli(
-                "evaluate_migration.py",
-                "--baseline",
-                baseline_path,
-                "--source",
-                source_checks_path,
-                "--target",
-                target_checks_path,
-                "--parity",
-                parity_path,
-                "--contract",
-                contract_path,
-                "--manifest",
-                manifest_path,
-                "--state",
-                state_path,
-                "--output",
-                result_path,
-            )
-            self.assertEqual(json.loads(result_path.read_text(encoding="utf-8"))["status"], "VERIFIED")
-
-            (target / "cli.py").write_text(cli_code.replace("'hello ' + args[1]", "'goodbye ' + args[1]"), encoding="utf-8")
-            write_json(target_parity_path, run_adapter(target))
-            negative = subprocess.run(
-                [
-                    sys.executable,
-                    str(SCRIPT_ROOT / "compare_results.py"),
-                    "--source",
-                    str(source_parity_path),
-                    "--target",
-                    str(target_parity_path),
-                    "--contract",
-                    str(contract_path),
-                    "--corpus",
-                    str(corpus_path),
-                    "--manifest",
-                    str(manifest_path),
-                    "--output",
-                    str(migration / "negative-control.json"),
-                    "--expect-mismatch",
-                ],
-                cwd=str(SCRIPT_ROOT.parent),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                check=False,
-            )
-            self.assertEqual(negative.returncode, 0, negative.stderr)
-            negative_report = json.loads((migration / "negative-control.json").read_text(encoding="utf-8"))
-            self.assertEqual(negative_report["status"], "negative_control_passed")
 
 
 if __name__ == "__main__":

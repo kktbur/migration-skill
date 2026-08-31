@@ -16,13 +16,17 @@ try:
         FrozenStateError,
         canonical_path,
         checks_from_spec,
+        git_revision,
         load_json,
-        result_map,
         result_items,
+        result_map,
+        sha256_bytes,
+        tree_digest,
         verify_freeze,
         write_json,
     )
     from validate_contract import validate_documents
+    from validate_judge import validate_artifact
 except ImportError:  # pragma: no cover
     from .common import (
         ConfigError,
@@ -32,13 +36,17 @@ except ImportError:  # pragma: no cover
         FrozenStateError,
         canonical_path,
         checks_from_spec,
+        git_revision,
         load_json,
-        result_map,
         result_items,
+        result_map,
+        sha256_bytes,
+        tree_digest,
         verify_freeze,
         write_json,
     )
     from .validate_contract import validate_documents
+    from .validate_judge import validate_artifact
 
 
 QUALITY_KINDS = {
@@ -96,9 +104,20 @@ def _target_failures(contract: dict[str, Any], target: Any) -> tuple[list[str], 
     }
 
 
+def _required_check_kinds(contract: dict[str, Any]) -> set[str]:
+    gates = contract.get("completion_gates", {})
+    if not isinstance(gates, dict) or "required_check_kinds" not in gates:
+        return set()
+    values = gates.get("required_check_kinds", [])
+    if not isinstance(values, list):
+        return set()
+    return {str(value).lower() for value in values}
+
+
 def _quality_gates(contract: dict[str, Any], target: Any) -> dict[str, dict[str, Any]]:
     expected = _expected_check_map(contract, "target")
     actual = result_map(target, "checks")
+    required_kinds = _required_check_kinds(contract)
     gates: dict[str, dict[str, Any]] = {}
     for gate_name, kinds in QUALITY_KINDS.items():
         configured = [
@@ -116,14 +135,21 @@ def _quality_gates(contract: dict[str, Any], target: Any) -> dict[str, dict[str,
             for check_id in configured
             if check_id not in actual or _status(actual[check_id]) != "passed"
         ]
+        required = gate_name in required_kinds
         gates[gate_name] = {
+            "required": required,
             "configured": bool(configured),
             "checks": sorted(configured),
             "observed": sorted(observed),
-            "passed": bool(configured) and not failed,
+            "passed": bool(configured) and not failed if required else not failed,
             "failed": sorted(failed),
+            "missing_required_configuration": required and not configured,
         }
     return gates
+
+
+def _operation_key(surface_id: str, operation_id: str) -> str:
+    return f"{surface_id}/{operation_id}"
 
 
 def _surface_coverage(contract: dict[str, Any], corpus: dict[str, Any], parity: Any) -> dict[str, Any]:
@@ -147,45 +173,124 @@ def _surface_coverage(contract: dict[str, Any], corpus: dict[str, Any], parity: 
     }
     missing_cases = sorted(case_id for case_id in required_cases if case_id not in parity_cases)
     failed_cases = sorted(
-        case_id for case_id in required_cases if case_id in parity_cases and not parity_cases[case_id].get("passed", False)
+        case_id
+        for case_id in required_cases
+        if case_id in parity_cases and not parity_cases[case_id].get("passed", False)
     )
-    missing_surfaces = sorted(surface_id for surface_id in required_surfaces if surface_id not in covered_surfaces)
+
+    required_operations: set[str] = set()
+    declared_operations: set[str] = set()
+    missing_operation_declarations: list[str] = []
+    for surface in contract.get("public_surfaces", []):
+        if not isinstance(surface, dict) or not surface.get("required", True):
+            continue
+        surface_id = surface.get("id")
+        operations = surface.get("operations")
+        if not isinstance(operations, list) or not operations:
+            missing_operation_declarations.append(str(surface_id))
+            continue
+        for operation in operations:
+            if not isinstance(operation, dict) or not isinstance(operation.get("id"), str):
+                continue
+            operation_key = _operation_key(str(surface_id), operation["id"])
+            declared_operations.add(operation_key)
+            if operation.get("required", True):
+                required_operations.add(operation_key)
+
+    required_case_operations: dict[str, set[str]] = {}
+    for case_id, case in required_cases.items():
+        surface_id = case.get("surface_id")
+        operation_id = case.get("operation_id")
+        if isinstance(surface_id, str) and isinstance(operation_id, str):
+            key = _operation_key(surface_id, operation_id)
+            required_case_operations.setdefault(key, set()).add(case_id)
+    covered_operations = {
+        key
+        for key, case_ids in required_case_operations.items()
+        if any(case_id in parity_cases for case_id in case_ids)
+    }
+    missing_operations = sorted(
+        required_operations - covered_operations
+        | {_operation_key(surface_id, "<operations-not-declared>") for surface_id in missing_operation_declarations}
+    )
+    operation_coverage_available = not missing_operation_declarations and bool(required_surfaces) and bool(declared_operations)
+    all_required_operations_covered = operation_coverage_available and not missing_operations
+    missing_surfaces = sorted(
+        surface_id
+        for surface_id in required_surfaces
+        if surface_id not in covered_surfaces or surface_id in missing_operation_declarations
+    )
     return {
         "required_surfaces": sorted(required_surfaces),
         "covered_surfaces": sorted(covered_surfaces),
         "missing_surfaces": missing_surfaces,
+        "required_operations": sorted(required_operations),
+        "declared_operations": sorted(declared_operations),
+        "covered_operations": sorted(covered_operations),
+        "missing_operations": missing_operations,
+        "operation_coverage_available": operation_coverage_available,
         "required_cases": sorted(required_cases),
         "missing_cases": missing_cases,
         "failed_cases": failed_cases,
         "all_required_surfaces_covered": not missing_surfaces,
+        "all_required_operations_covered": all_required_operations_covered,
         "all_required_cases_present": not missing_cases,
         "all_required_cases_passed": not failed_cases,
     }
 
 
-def _judge_state(state: dict[str, Any], freeze: dict[str, Any]) -> dict[str, Any]:
-    judge = state.get("judge", {})
-    if not isinstance(judge, dict):
-        judge = {}
-    frozen_files = freeze.get("manifest", {}).get("files", {}) if isinstance(freeze, dict) else {}
-    frozen_judge = frozen_files.get("judge_validation") if isinstance(frozen_files, dict) else None
-    if isinstance(frozen_judge, dict) and isinstance(frozen_judge.get("path"), str):
-        try:
-            frozen_document = load_json(frozen_judge["path"])
-        except ConfigError:
-            frozen_document = {}
-        positive = isinstance(frozen_document, dict) and frozen_document.get("positive_control") is True
-        negative = isinstance(frozen_document, dict) and frozen_document.get("negative_control") is True
-        source = "frozen-judge-validation"
-    else:
-        positive = judge.get("positive_control") is True
-        negative = judge.get("negative_control") is True
-        source = "state"
+def _judge_state(freeze: dict[str, Any]) -> dict[str, Any]:
+    manifest = freeze.get("manifest", {}) if isinstance(freeze, dict) else {}
+    files = manifest.get("files", {}) if isinstance(manifest, dict) else {}
+    entry = files.get("judge_validation") if isinstance(files, dict) else None
+    if not isinstance(entry, dict) or not isinstance(entry.get("path"), str):
+        return {
+            "positive_control": False,
+            "negative_control": False,
+            "valid": False,
+            "source": "missing-frozen-judge-validation",
+        }
+    try:
+        document = load_json(entry["path"])
+    except ConfigError:
+        document = {}
+    errors = validate_artifact(document)
     return {
-        "positive_control": positive,
-        "negative_control": negative,
-        "valid": positive and negative,
-        "source": source,
+        "positive_control": isinstance(document, dict) and document.get("positive_control") is True,
+        "negative_control": isinstance(document, dict) and document.get("negative_control") is True,
+        "valid": not errors,
+        "source": "frozen-judge-validation",
+        "errors": errors,
+    }
+
+
+def _resume_state(state: dict[str, Any], target: Any) -> dict[str, Any]:
+    checkpoint = state.get("last_accepted_checkpoint")
+    if checkpoint is None:
+        return {"status": "not_started", "valid": True}
+    if not isinstance(checkpoint, dict):
+        return {"status": "legacy-unverifiable", "valid": False, "reason": "checkpoint lacks target digest"}
+    target_root_value = target.get("root") if isinstance(target, dict) else None
+    expected_root = checkpoint.get("target_root")
+    expected_digest = checkpoint.get("target_tree_digest")
+    expected_revision = checkpoint.get("target_revision")
+    if not isinstance(target_root_value, str) or not isinstance(expected_digest, str):
+        return {"status": "invalid", "valid": False, "reason": "target root or digest is missing"}
+    target_root = canonical_path(target_root_value)
+    if not target_root.exists() or not target_root.is_dir():
+        return {"status": "invalid", "valid": False, "reason": "target root does not exist"}
+    actual_digest = tree_digest(target_root)
+    actual_revision = git_revision(target_root)
+    valid = actual_digest == expected_digest and actual_revision == expected_revision
+    return {
+        "status": "verified" if valid else "invalidated",
+        "valid": valid,
+        "target_root": str(target_root),
+        "expected_target_tree_digest": expected_digest,
+        "actual_target_tree_digest": actual_digest,
+        "expected_target_revision": expected_revision,
+        "actual_target_revision": actual_revision,
+        "checkpoint": checkpoint,
     }
 
 
@@ -213,7 +318,8 @@ def evaluate(
     target_failures, target_observation = _target_failures(contract, target)
     quality_gates = _quality_gates(contract, target)
     coverage = _surface_coverage(contract, corpus, parity)
-    judge = _judge_state(state, freeze)
+    judge = _judge_state(freeze)
+    resume = _resume_state(state, target)
     required_gaps = state.get("required_gaps", [])
     if not isinstance(required_gaps, list):
         required_gaps = ["state.required_gaps is not a list"]
@@ -229,30 +335,52 @@ def evaluate(
     baseline_capture_clean = not bool(
         isinstance(baseline, dict) and baseline.get("source_changed_during_baseline")
     )
+    baseline_status = baseline.get("status") if isinstance(baseline, dict) else None
+    baseline_capture_reliable = baseline_status in {
+        "captured_clean",
+        "captured_with_inherited_failures",
+    }
     frozen_source = freeze.get("manifest", {}).get("source", {}) if isinstance(freeze, dict) else {}
     baseline_identity_matches = (
         isinstance(baseline, dict)
         and baseline.get("revision") == frozen_source.get("revision")
         and baseline.get("tree_digest") == frozen_source.get("tree_digest")
     )
-    quality_passed = all(gate["passed"] for gate in quality_gates.values())
+    required_quality_gates = {
+        name: gate for name, gate in quality_gates.items() if gate["required"]
+    }
+    quality_passed = all(gate["passed"] for gate in required_quality_gates.values())
     target_checks_passed = not target_failures
     no_required_gaps = not required_gaps
-    all_required_gates = (
-        freeze.get("intact", False)
-        and baseline_capture_clean
-        and baseline_identity_matches
-        and not source_regressions
-        and target_checks_passed
-        and quality_passed
-        and parity_passed
-        and coverage["all_required_surfaces_covered"]
-        and no_required_gaps
-        and judge["valid"]
-    )
-    if not judge["valid"]:
+    required_conditions = {
+        "freeze_intact": bool(freeze.get("intact", False)),
+        "baseline_capture_clean": baseline_capture_clean,
+        "baseline_capture_reliable": baseline_capture_reliable,
+        "baseline_identity_matches": baseline_identity_matches,
+        "no_new_source_regression": not source_regressions,
+        "target_required_checks": target_checks_passed,
+        "required_quality_gates": quality_passed,
+        "parity": parity_passed,
+        "public_surface_coverage": coverage["all_required_surfaces_covered"],
+        "operation_coverage": coverage["all_required_operations_covered"],
+        "no_required_gaps": no_required_gaps,
+        "judge_valid": judge["valid"],
+        "resume_checkpoint": resume["valid"],
+    }
+    all_required_gates = all(required_conditions.values())
+    if not required_conditions["freeze_intact"]:
+        status = "INVALIDATED"
+    elif not judge["valid"]:
         status = "PLAN_ONLY"
-    elif source_regressions or not baseline_capture_clean or not baseline_identity_matches or required_gaps:
+    elif not resume["valid"]:
+        status = "INVALIDATED"
+    elif (
+        source_regressions
+        or not baseline_capture_clean
+        or not baseline_capture_reliable
+        or not baseline_identity_matches
+        or required_gaps
+    ):
         status = "BLOCKED"
     elif all_required_gates:
         status = "VERIFIED"
@@ -260,51 +388,28 @@ def evaluate(
         status = "PARTIALLY_VERIFIED"
 
     gate_failures: list[str] = []
-    if not baseline_capture_clean:
-        gate_failures.append("baseline-source-changed-during-capture")
-    if not baseline_identity_matches:
-        gate_failures.append("baseline-source-identity-does-not-match-freeze")
-    if source_regressions:
-        gate_failures.extend(f"new-source-regression:{item}" for item in source_regressions)
+    for name, passed in required_conditions.items():
+        if not passed:
+            gate_failures.append(f"{name}-not-passed")
     if target_failures:
         gate_failures.extend(f"target-check-failed:{item}" for item in target_failures)
-    for gate_name, gate in quality_gates.items():
-        if not gate["passed"]:
-            gate_failures.append(f"target-{gate_name}-gate-not-passed")
-    if not parity_passed:
-        gate_failures.append("parity-gate-not-passed")
-    for surface_id in coverage["missing_surfaces"]:
-        gate_failures.append(f"required-surface-uncovered:{surface_id}")
     for case_id in coverage["missing_cases"]:
         gate_failures.append(f"required-parity-case-missing:{case_id}")
     for case_id in coverage["failed_cases"]:
         gate_failures.append(f"required-parity-case-failed:{case_id}")
+    for operation_id in coverage["missing_operations"]:
+        gate_failures.append(f"required-operation-uncovered:{operation_id}")
     gate_failures.extend(f"required-gap:{gap}" for gap in required_gaps)
-    if not judge["valid"]:
-        gate_failures.append("judge-validation-missing-or-invalid")
-    total_gates = 10
-    passed_gate_count = sum(
-        bool(value)
-        for value in (
-            freeze.get("intact", False),
-            baseline_capture_clean,
-            baseline_identity_matches,
-            not source_regressions,
-            target_checks_passed,
-            quality_passed,
-            parity_passed,
-            coverage["all_required_surfaces_covered"],
-            no_required_gaps,
-            judge["valid"],
-        )
-    )
+    total_gates = len(required_conditions)
+    passed_gate_count = sum(bool(value) for value in required_conditions.values())
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": status,
         "source_baseline_regressed": bool(source_regressions),
         "source_regressions": source_regressions,
         "inherited_failures": _inherited_failures(baseline),
         "baseline_capture_clean": baseline_capture_clean,
+        "baseline_capture_reliable": baseline_capture_reliable,
         "baseline_identity_matches": baseline_identity_matches,
         "target": {
             "checks_passed": target_checks_passed,
@@ -321,13 +426,16 @@ def evaluate(
         "judge": judge,
         "freeze_intact": bool(freeze.get("intact")),
         "required_gaps": [str(item) for item in required_gaps],
+        "required_conditions": required_conditions,
         "gate_failures": sorted(set(gate_failures)),
-        "migration_score": round(passed_gate_count / total_gates, 4),
+        "migration_score": round(passed_gate_count / total_gates, 4) if total_gates else 0.0,
         "score_is_informational_only": True,
+        "ratchet_eligible": all_required_gates,
         "resume": {
             "current_milestone": state.get("current_milestone"),
             "completed_milestones": state.get("completed_milestones", []),
             "last_accepted_checkpoint": state.get("last_accepted_checkpoint"),
+            "checkpoint_validation": resume,
         },
     }
 

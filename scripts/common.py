@@ -1,9 +1,9 @@
 """Shared standard-library helpers for Migration Skill scripts.
 
-The public scripts deliberately keep their command line interfaces small.  This
-module contains the boring, deterministic pieces that must behave the same in
-every phase: JSON I/O, safe path handling, tree hashing, command execution and
-result summaries.
+The public scripts deliberately keep their command line interfaces small. This
+module contains the deterministic pieces that must behave the same in every
+phase: JSON I/O, safe path handling, source hashing, command execution,
+comparison normalization, and result summaries.
 """
 
 from __future__ import annotations
@@ -24,11 +24,14 @@ EXIT_OK = 0
 EXIT_FAILED = 1
 EXIT_INVALID = 2
 
-TOOL_VERSION = "0.1.0"
-SCHEMA_VERSION = 1
+TOOL_VERSION = "0.2.0"
+FREEZE_SCHEMA_VERSION = 2
+SCHEMA_VERSION = FREEZE_SCHEMA_VERSION
 
-# These directories are generated or dependency-heavy and must not influence
-# the source evidence digest.  The inventory script uses the same policy.
+# Generic non-Git inventory/digest traversal skips generated and dependency
+# directories. A Git-aware traversal below prefers tracked plus non-ignored
+# working-tree files, so a tracked directory named ``target`` is not silently
+# discarded.
 IGNORED_TREE_DIRS = frozenset(
     {
         ".git",
@@ -53,6 +56,42 @@ IGNORED_TREE_DIRS = frozenset(
     }
 )
 
+ALWAYS_IGNORED_TREE_DIRS = frozenset({".git", ".migration"})
+SECRET_FILE_NAMES = frozenset(
+    {
+        "credentials",
+        "credentials.json",
+        "credentials.yaml",
+        "credentials.yml",
+        "secret",
+        "secret.json",
+        "secret.yaml",
+        "secret.yml",
+        "secrets.yaml",
+        "secrets.json",
+        "id_rsa",
+        "id_ed25519",
+        "id_ecdsa",
+    }
+)
+SECRET_FILE_SUFFIXES = frozenset({".pem", ".key", ".p12", ".pfx", ".jks", ".p8", ".der"})
+SAFE_ENV_KEYS = frozenset(
+    {
+        "PATH",
+        "PATHEXT",
+        "SystemRoot",
+        "WINDIR",
+        "TEMP",
+        "TMP",
+        "HOME",
+        "USERPROFILE",
+        "LANG",
+        "LC_ALL",
+    }
+)
+SECRET_ENV_PATTERN = re.compile(
+    r"(?i)(^|_)(api[_-]?key|access[_-]?key|token|secret|password|passwd|credential|private[_-]?key|auth)(_|$)"
+)
 VAR_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
 
@@ -82,6 +121,7 @@ def write_json(path: str | os.PathLike[str], value: Any) -> None:
     file_path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)
     payload += "\n"
+    temporary_path: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(
             "w",
@@ -98,7 +138,7 @@ def write_json(path: str | os.PathLike[str], value: Any) -> None:
     except OSError as exc:
         raise ConfigError(f"无法写入 JSON: {file_path}: {exc}") from exc
     finally:
-        if "temporary_path" in locals() and temporary_path.exists():
+        if temporary_path is not None and temporary_path.exists():
             try:
                 temporary_path.unlink()
             except OSError:
@@ -124,6 +164,7 @@ def is_within(path: Path, root: Path) -> bool:
 def resolve_cwd(root: Path, raw_cwd: Any) -> Path:
     """Resolve a check cwd and reject paths outside the execution root."""
 
+    root = canonical_path(root)
     if raw_cwd is None:
         candidate = root
     elif not isinstance(raw_cwd, str) or not raw_cwd:
@@ -148,11 +189,7 @@ def validate_argv(argv: Any, field_name: str = "argv") -> list[str]:
 
 
 def expand_vars(value: str, variables: Mapping[str, str]) -> str:
-    """Expand only explicitly supplied ``${NAME}`` variables.
-
-    Not consulting the ambient environment here makes command specifications
-    reproducible and avoids silently injecting credentials into argv.
-    """
+    """Expand only explicitly supplied ``${NAME}`` variables."""
 
     def replace(match: re.Match[str]) -> str:
         name = match.group(1)
@@ -183,19 +220,40 @@ def cap_text(value: str | bytes | None, limit: int) -> tuple[str, bool]:
     return text[:limit], True
 
 
-def normalize_text(value: Any) -> str:
-    """Normalize only line endings and trailing whitespace per the v1 policy."""
+def normalize_text(value: Any, normalization: Any = None) -> str:
+    """Apply only explicitly allowed text normalizations.
+
+    ``text-normalized`` uses both rules by default. Other modes apply only the
+    rules explicitly supplied by their comparator configuration.
+    """
 
     if not isinstance(value, str):
-        raise ConfigError("text-normalized 比较要求字符串")
-    value = value.replace("\r\n", "\n").replace("\r", "\n")
-    return "\n".join(line.rstrip() for line in value.split("\n"))
+        raise ConfigError("文本比较要求字符串")
+    rules: list[str]
+    if normalization is None:
+        rules = []
+    elif isinstance(normalization, str):
+        rules = [normalization]
+    elif isinstance(normalization, list) and all(isinstance(item, str) for item in normalization):
+        rules = list(normalization)
+    else:
+        raise ConfigError("normalization 必须是字符串或字符串数组")
+    unknown = set(rules) - {"crlf-to-lf", "trim-trailing-whitespace"}
+    if unknown:
+        raise ConfigError(f"不支持的 normalization: {sorted(unknown)}")
+    if "crlf-to-lf" in rules:
+        value = value.replace("\r\n", "\n").replace("\r", "\n")
+    if "trim-trailing-whitespace" in rules:
+        value = "\n".join(line.rstrip() for line in value.split("\n"))
+    return value
 
 
-def normalize_json_value(value: Any) -> Any:
+def normalize_json_value(value: Any, normalization: Any = None) -> Any:
     """Convert JSON-like values into a stable semantic representation."""
 
     if isinstance(value, str):
+        if normalization is not None:
+            value = normalize_text(value, normalization)
         try:
             return json.loads(value)
         except json.JSONDecodeError as exc:
@@ -203,17 +261,24 @@ def normalize_json_value(value: Any) -> Any:
     return value
 
 
-def compare_values(source: Any, target: Any, mode: str) -> bool:
+def compare_values(source: Any, target: Any, mode: str, normalization: Any = None) -> bool:
     """Compare two observed values using an explicit contract comparator."""
 
-    if mode == "exact" or mode == "snapshot":
+    if mode in {"exact", "snapshot", "exit-code"}:
+        if normalization is None:
+            return source == target
+        if isinstance(source, str) and isinstance(target, str):
+            return normalize_text(source, normalization) == normalize_text(target, normalization)
         return source == target
-    if mode in {"text", "text-normalized"}:
-        return normalize_text(source) == normalize_text(target)
+    if mode == "text":
+        if normalization is None:
+            return source == target
+        return normalize_text(source, normalization) == normalize_text(target, normalization)
+    if mode == "text-normalized":
+        rules = normalization if normalization is not None else ["crlf-to-lf", "trim-trailing-whitespace"]
+        return normalize_text(source, rules) == normalize_text(target, rules)
     if mode == "json-semantic":
-        return normalize_json_value(source) == normalize_json_value(target)
-    if mode == "exit-code":
-        return source == target
+        return normalize_json_value(source, normalization) == normalize_json_value(target, normalization)
     raise ConfigError(f"不支持的比较模式: {mode}")
 
 
@@ -233,12 +298,77 @@ def sha256_file(path: str | os.PathLike[str]) -> str:
     return "sha256:" + digest.hexdigest()
 
 
+def is_secret_path(relative: str | os.PathLike[str]) -> bool:
+    """Return whether a relative source path is treated as secret material."""
+
+    path = Path(relative)
+    name = path.name.lower()
+    if name in SECRET_FILE_NAMES or path.suffix.lower() in SECRET_FILE_SUFFIXES:
+        return True
+    if any(token in name for token in ("secret", "credential")):
+        return True
+    if name.startswith(".env") and name not in {".env.example", ".env.sample", ".env.template"}:
+        return True
+    return any(part.lower() in {"secrets", "credentials"} for part in path.parts)
+
+
+def _git_file_paths(root: Path) -> list[str] | None:
+    """Return tracked and non-ignored paths for a Git root, if available."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(canonical_path(root)), "ls-files", "-co", "--exclude-standard", "-z"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=10,
+            shell=False,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if completed.returncode != 0:
+        return None
+    try:
+        raw_paths = completed.stdout.decode("utf-8", errors="surrogateescape").split("\0")
+    except AttributeError:
+        return None
+    paths = []
+    for raw in raw_paths:
+        if not raw:
+            continue
+        path = Path(raw)
+        if path.is_absolute() or ".." in path.parts:
+            continue
+        if any(part.lower() in ALWAYS_IGNORED_TREE_DIRS for part in path.parts):
+            continue
+        if is_secret_path(path):
+            continue
+        paths.append(path.as_posix())
+    return sorted(set(paths))
+
+
 def iter_source_files(root: Path) -> Iterable[tuple[Path, str]]:
-    """Yield regular files and relative POSIX paths under a source root."""
+    """Yield regular non-secret files and relative POSIX paths.
+
+    Git repositories use tracked plus non-ignored working-tree files. Generic
+    trees use the conservative generated-directory policy. Secret-like files
+    are excluded from both modes before their contents are opened.
+    """
 
     root = canonical_path(root)
     if not root.exists() or not root.is_dir():
         raise ConfigError(f"root 不存在或不是目录: {root}")
+
+    git_paths = _git_file_paths(root)
+    if git_paths is not None:
+        for relative in git_paths:
+            candidate = root / relative
+            if candidate.is_symlink() or not candidate.is_file():
+                continue
+            yield candidate, relative
+        return
+
     for current, directories, filenames in os.walk(root, topdown=True, followlinks=False):
         current_path = Path(current)
         kept_directories: list[str] = []
@@ -253,23 +383,27 @@ def iter_source_files(root: Path) -> Iterable[tuple[Path, str]]:
             if candidate.is_symlink() or not candidate.is_file():
                 continue
             relative = candidate.relative_to(root).as_posix()
+            if is_secret_path(relative):
+                continue
             yield candidate, relative
 
 
 def tree_digest(root: Path) -> str:
-    """Hash path names and file bytes while ignoring generated directories."""
+    """Hash path names and file bytes with a streaming, secret-aware policy."""
 
     digest = hashlib.sha256()
     for file_path, relative in iter_source_files(root):
-        try:
-            data = file_path.read_bytes()
-        except OSError as exc:
-            raise ConfigError(f"无法读取 source 文件: {file_path}: {exc}") from exc
         encoded_name = relative.encode("utf-8")
         digest.update(len(encoded_name).to_bytes(8, "big"))
         digest.update(encoded_name)
-        digest.update(len(data).to_bytes(8, "big"))
-        digest.update(data)
+        try:
+            file_size = file_path.stat().st_size
+            digest.update(file_size.to_bytes(8, "big"))
+            with file_path.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(chunk)
+        except OSError as exc:
+            raise ConfigError(f"无法读取 source 文件: {file_path}: {exc}") from exc
     return "sha256:" + digest.hexdigest()
 
 
@@ -297,24 +431,97 @@ def git_revision(root: Path) -> str | None:
     return revision or None
 
 
-def _safe_env() -> dict[str, str]:
-    """Return the execution environment without ever serializing it."""
+def is_secret_env_name(name: str) -> bool:
+    return bool(SECRET_ENV_PATTERN.search(name))
 
-    return {str(key): str(value) for key, value in os.environ.items()}
+
+def validate_variable_name(name: str, label: str = "variable") -> str:
+    """Validate an explicit command variable without permitting secret-shaped names."""
+
+    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        raise ConfigError(f"{label} 名称无效: {name!r}")
+    if is_secret_env_name(name):
+        raise ConfigError(f"{label} 不允许疑似 Secret 环境变量: {name}")
+    return name
+
+
+def _ambient_value(name: str) -> tuple[str, str] | None:
+    for actual, value in os.environ.items():
+        if actual.lower() == name.lower():
+            return actual, str(value)
+    return None
+
+
+def _validate_environment_spec(spec: Any, label: str = "environment") -> tuple[list[str], dict[str, str]]:
+    if spec is None:
+        return [], {}
+    if not isinstance(spec, dict):
+        raise ConfigError(f"{label} 必须是对象")
+    unknown = set(spec) - {"inherit", "set"}
+    if unknown:
+        raise ConfigError(f"{label} 包含未知字段: {sorted(unknown)}")
+    inherit = spec.get("inherit", [])
+    if not isinstance(inherit, list) or any(not isinstance(item, str) or not item for item in inherit):
+        raise ConfigError(f"{label}.inherit 必须是字符串数组")
+    values = spec.get("set", {})
+    if not isinstance(values, dict) or any(
+        not isinstance(key, str) or not key or not isinstance(value, str) for key, value in values.items()
+    ):
+        raise ConfigError(f"{label}.set 必须是字符串到字符串的对象")
+    for key in [*inherit, *values]:
+        if "\x00" in key or is_secret_env_name(key):
+            raise ConfigError(f"{label} 不允许继承或设置疑似 Secret 环境变量: {key}")
+    return list(dict.fromkeys(inherit)), dict(values)
+
+
+def _safe_env(
+    environment_spec: Mapping[str, Any] | None = None,
+    variables: Mapping[str, str] | None = None,
+) -> dict[str, str]:
+    """Build a minimum environment without implicit credential inheritance.
+
+    Only the platform-safe allowlist is copied by default. Additional names
+    and values must be explicitly declared by a Contract and secret-shaped
+    names are rejected even when explicitly requested.
+    """
+
+    inherit, set_values = _validate_environment_spec(environment_spec or {})
+    variables = variables or {}
+    environment: dict[str, str] = {}
+    for key in SAFE_ENV_KEYS:
+        found = _ambient_value(key)
+        if found is not None:
+            actual, value = found
+            environment[actual] = value
+    for key in inherit:
+        found = _ambient_value(key)
+        if found is not None:
+            actual, value = found
+            environment[actual] = value
+    for key, value in set_values.items():
+        environment[key] = expand_vars(value, variables)
+    return environment
+
+
+def _merge_environment_specs(
+    base: Mapping[str, Any] | None,
+    override: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    base_inherit, base_set = _validate_environment_spec(base or {}, "environment")
+    override_inherit, override_set = _validate_environment_spec(override or {}, "check.environment")
+    merged_set = dict(base_set)
+    merged_set.update(override_set)
+    return {"inherit": list(dict.fromkeys([*base_inherit, *override_inherit])), "set": merged_set}
 
 
 def redact_text(value: str) -> str:
-    """Redact common credential-shaped output without logging environment data.
-
-    This is intentionally conservative: the helper never prints the ambient
-    environment, and only masks obvious bearer/basic authorization tokens in
-    captured output.  Real isolation still belongs to an external sandbox.
-    """
+    """Redact common credential-shaped output without logging environment data."""
 
     value = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]+", r"\1[REDACTED]", value)
     value = re.sub(r"(?i)(basic\s+)[A-Za-z0-9+/=]+", r"\1[REDACTED]", value)
     value = re.sub(r"(?i)(api[_ -]?key\s*[:=]\s*)[^\s,;]+", r"\1[REDACTED]", value)
     value = re.sub(r"(?i)(token\s*[:=]\s*)[^\s,;]+", r"\1[REDACTED]", value)
+    value = re.sub(r"(?i)(password|secret|credential|private[_ -]?key)\s*[:=]\s*[^\s,;]+", r"\1=[REDACTED]", value)
     return value
 
 
@@ -323,6 +530,7 @@ def run_check(
     check: Mapping[str, Any],
     variables: Mapping[str, str] | None = None,
     output_limit: int = 20000,
+    environment_spec: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one explicit argv check with shell disabled."""
 
@@ -339,20 +547,21 @@ def run_check(
     if not isinstance(expected_exit_code, int) or isinstance(expected_exit_code, bool):
         raise ConfigError(f"check[{check_id}].expected_exit_code 必须是整数")
     timeout_seconds = check.get("timeout_seconds", 60)
-    if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool):
+    if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool) or timeout_seconds <= 0:
         raise ConfigError(f"check[{check_id}].timeout_seconds 必须是正数")
-    if timeout_seconds <= 0:
-        raise ConfigError(f"check[{check_id}].timeout_seconds 必须是正数")
-    env_spec = check.get("env", {})
-    if env_spec is None:
-        env_spec = {}
-    if not isinstance(env_spec, dict) or any(
-        not isinstance(key, str) or not isinstance(value, str) for key, value in env_spec.items()
-    ):
-        raise ConfigError(f"check[{check_id}].env 必须是字符串到字符串的对象")
-    environment = _safe_env()
-    for key, value in env_spec.items():
-        environment[key] = expand_vars(value, variables)
+
+    check_environment = check.get("environment")
+    legacy_env = check.get("env")
+    if check_environment is not None and legacy_env is not None:
+        raise ConfigError(f"check[{check_id}] 不能同时使用 environment 和旧版 env")
+    if check_environment is None and legacy_env is not None:
+        if not isinstance(legacy_env, dict):
+            raise ConfigError(f"check[{check_id}].env 必须是字符串到字符串的对象")
+        check_environment = {"set": legacy_env}
+    environment = _safe_env(
+        _merge_environment_specs(environment_spec, check_environment),
+        variables,
+    )
 
     started = time.perf_counter()
     status = "failed"
@@ -360,6 +569,7 @@ def run_check(
     timed_out = False
     stdout_value = ""
     stderr_value = ""
+    execution_error: str | None = None
     try:
         completed = subprocess.run(
             argv,
@@ -384,13 +594,19 @@ def run_check(
         status = "timeout"
         stdout_value = exc.stdout or ""
         stderr_value = exc.stderr or ""
+        execution_error = "timeout"
+    except FileNotFoundError as exc:
+        status = "failed"
+        stderr_value = str(exc)
+        execution_error = "command-not-found"
     except OSError as exc:
         status = "failed"
         stderr_value = str(exc)
+        execution_error = "execution-error"
     duration = time.perf_counter() - started
     stdout_value, stdout_truncated = cap_text(stdout_value, output_limit)
     stderr_value, stderr_truncated = cap_text(stderr_value, output_limit)
-    return {
+    result = {
         "id": check_id,
         "kind": check.get("kind", "check"),
         "required": required,
@@ -406,6 +622,9 @@ def run_check(
         "stderr_truncated": stderr_truncated,
         "duration_seconds": round(duration, 6),
     }
+    if execution_error:
+        result["execution_error"] = execution_error
+    return result
 
 
 def summarize_results(results: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -489,11 +708,47 @@ def result_map(document: Any, preferred_key: str = "results") -> dict[str, dict[
     return mapping
 
 
+def _bundle_files(root: Path) -> dict[str, Path]:
+    if not root.exists() or not root.is_dir():
+        raise FrozenStateError(f"verifier bundle root 不存在: {root}")
+    files: dict[str, Path] = {}
+    for path in sorted(root.rglob("*.py")):
+        if path.is_symlink() or not path.is_file() or "__pycache__" in path.parts:
+            continue
+        files[path.relative_to(root).as_posix()] = path
+    if not files:
+        raise FrozenStateError(f"verifier bundle 没有 Python 文件: {root}")
+    return files
+
+
+def _verify_file_entries(entries: Mapping[str, Any], label: str) -> list[str]:
+    if not isinstance(entries, dict) or not entries:
+        raise FrozenStateError(f"freeze manifest 缺少 {label}")
+    verified: list[str] = []
+    for entry_label, entry in entries.items():
+        if not isinstance(entry, dict):
+            raise FrozenStateError(f"冻结文件条目无效: {entry_label}")
+        file_value = entry.get("path")
+        expected_hash = entry.get("sha256")
+        if not isinstance(file_value, str) or not isinstance(expected_hash, str):
+            raise FrozenStateError(f"冻结文件条目缺少 path/sha256: {entry_label}")
+        file_path = canonical_path(file_value)
+        if not file_path.exists() or not file_path.is_file():
+            raise FrozenStateError(f"冻结文件不存在: {file_path}")
+        actual_hash = sha256_file(file_path)
+        if actual_hash != expected_hash:
+            raise FrozenStateError(
+                f"冻结文件已变化: {entry_label}: expected={expected_hash}, current={actual_hash}"
+            )
+        verified.append(str(entry_label))
+    return verified
+
+
 def verify_freeze(manifest_path: str | os.PathLike[str]) -> dict[str, Any]:
-    """Verify every source and evidence digest in a freeze manifest."""
+    """Verify source evidence, assets, and the complete verifier bundle."""
 
     manifest = load_json(manifest_path)
-    if not isinstance(manifest, dict) or manifest.get("schema_version") != SCHEMA_VERSION:
+    if not isinstance(manifest, dict) or manifest.get("schema_version") not in {1, FREEZE_SCHEMA_VERSION}:
         raise FrozenStateError("freeze manifest schema_version 不受支持")
     source = manifest.get("source")
     if not isinstance(source, dict):
@@ -518,25 +773,63 @@ def verify_freeze(manifest_path: str | os.PathLike[str]) -> dict[str, Any]:
         )
 
     files = manifest.get("files")
-    if not isinstance(files, dict) or not files:
-        raise FrozenStateError("freeze manifest 缺少 files")
-    verified_files: list[str] = []
-    for label, entry in files.items():
-        if not isinstance(entry, dict):
-            raise FrozenStateError(f"冻结文件条目无效: {label}")
-        file_value = entry.get("path")
-        expected_hash = entry.get("sha256")
-        if not isinstance(file_value, str) or not isinstance(expected_hash, str):
-            raise FrozenStateError(f"冻结文件条目缺少 path/sha256: {label}")
-        file_path = canonical_path(file_value)
-        if not file_path.exists() or not file_path.is_file():
-            raise FrozenStateError(f"冻结文件不存在: {file_path}")
-        actual_hash = sha256_file(file_path)
-        if actual_hash != expected_hash:
-            raise FrozenStateError(
-                f"冻结文件已变化: {label}: expected={expected_hash}, current={actual_hash}"
-            )
-        verified_files.append(label)
+    verified_files = _verify_file_entries(files, "files")
+    if manifest.get("schema_version") == FREEZE_SCHEMA_VERSION:
+        contract_entry = files.get("contract") if isinstance(files, dict) else None
+        if not isinstance(contract_entry, dict) or not isinstance(contract_entry.get("path"), str):
+            raise FrozenStateError("freeze manifest 缺少冻结 contract")
+        contract = load_json(contract_entry["path"])
+        if not isinstance(contract, dict):
+            raise FrozenStateError("冻结 contract 顶层必须是对象")
+        expected_check_specification = {
+            "checks": contract.get("checks", []),
+            "environment": contract.get("environment", {}),
+        }
+        recorded_check_specification = manifest.get("check_specification")
+        if recorded_check_specification != expected_check_specification:
+            raise FrozenStateError("冻结的 check specification 与 Contract 不一致")
+        recorded_digest = manifest.get("check_specification_digest")
+        actual_digest = sha256_bytes(
+            json.dumps(
+                recorded_check_specification,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+        if recorded_digest != actual_digest:
+            raise FrozenStateError("check specification digest 无效")
+        expected_normalization = {
+            "surface_comparators": {
+                surface["id"]: surface.get("compare", {})
+                for surface in contract.get("public_surfaces", [])
+                if isinstance(surface, dict) and isinstance(surface.get("id"), str)
+            },
+            "contract_normalization": contract.get("normalization_policy", {}),
+        }
+        if manifest.get("normalization_policy") != expected_normalization:
+            raise FrozenStateError("冻结的 normalization policy 与 Contract 不一致")
+    bundle_verified: list[str] = []
+    bundle = manifest.get("verifier_bundle")
+    if manifest.get("schema_version") == FREEZE_SCHEMA_VERSION:
+        if not isinstance(bundle, dict):
+            raise FrozenStateError("freeze manifest 缺少 verifier_bundle")
+        bundle_root_value = bundle.get("root")
+        entries = bundle.get("files")
+        if not isinstance(bundle_root_value, str):
+            raise FrozenStateError("verifier_bundle.root 无效")
+        bundle_root = canonical_path(bundle_root_value)
+        actual_bundle = _bundle_files(bundle_root)
+        if not isinstance(entries, dict) or set(entries) != set(actual_bundle):
+            raise FrozenStateError("verifier bundle 文件集合已变化")
+        for label, path in actual_bundle.items():
+            entry = entries.get(label)
+            if not isinstance(entry, dict) or entry.get("path") != str(path):
+                raise FrozenStateError(f"verifier bundle 路径已变化: {label}")
+            expected_hash = entry.get("sha256")
+            if expected_hash != sha256_file(path):
+                raise FrozenStateError(f"verifier bundle 文件已变化: {label}")
+            bundle_verified.append(label)
     return {
         "intact": True,
         "manifest": manifest,
@@ -544,6 +837,7 @@ def verify_freeze(manifest_path: str | os.PathLike[str]) -> dict[str, Any]:
         "revision": current_revision,
         "tree_digest": current_tree_digest,
         "verified_files": verified_files,
+        "verified_verifier_files": bundle_verified,
     }
 
 

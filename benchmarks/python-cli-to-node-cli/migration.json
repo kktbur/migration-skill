@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "source": {
+    "root": "source",
+    "revision": "AUTO",
+    "language": "Python",
+    "framework": "stdlib CLI",
+    "entrypoints": ["cli.py"]
+  },
+  "target": {
+    "root": "target",
+    "language": "Node.js",
+    "framework": "Node CLI",
+    "entrypoints": ["cli.js"]
+  },
+  "public_surfaces": [
+    {
+      "id": "main-cli",
+      "kind": "command",
+      "required": true,
+      "source_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "target_adapter": {
+        "kind": "harness",
+        "argv": ["${PYTHON}", "adapter.py"]
+      },
+      "compare": {"whole": {"mode": "json-semantic"}},
+      "evidence": ["cli.py", "test_cli.py"],
+      "confidence": "high",
+      "operations": [
+        {"id": "hello", "required": true, "evidence": ["cli.py", "test_cli.py"]},
+        {"id": "boundary-empty", "required": true, "evidence": ["cli.py", "test_cli.py"]},
+        {"id": "error", "required": true, "evidence": ["cli.py", "test_cli.py"]}
+      ]
+    }
+  ],
+  "completion_gates": {"required_check_kinds": ["test"]},
+  "checks": {
+    "source": [
+      {"id": "source-tests", "kind": "test", "argv": ["python", "-m", "unittest", "-q"]}
+    ],
+    "target": [
+      {"id": "target-tests", "kind": "test", "argv": ["node", "test.js"]}
+    ]
+  },
+  "parity_corpus": "parity-corpus.json"
+}

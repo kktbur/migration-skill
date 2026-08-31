@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 try:
     from common import (
@@ -50,7 +50,7 @@ def _observed(item: dict[str, Any]) -> Any:
     for key in ("observed", "output", "value"):
         if key in item:
             return item[key]
-    metadata = {"id", "surface_id", "status", "required", "duration_seconds"}
+    metadata = {"id", "surface_id", "operation_id", "status", "required", "duration_seconds"}
     payload = {key: value for key, value in item.items() if key not in metadata}
     return payload if payload else MISSING
 
@@ -66,29 +66,53 @@ def _comparator(value: Any) -> tuple[str, Any]:
     if isinstance(value, str):
         return value, None
     if isinstance(value, dict):
-        return str(value.get("mode")), value.get("normalization")
+        mode = value.get("mode")
+        if not isinstance(mode, str):
+            raise ConfigError("比较配置缺少 mode")
+        return mode, value.get("normalization")
     raise ConfigError("无效的比较配置")
 
 
-def _compare_surface(source_value: Any, target_value: Any, surface: dict[str, Any]) -> list[dict[str, Any]]:
+def _comparison_entries(surface: dict[str, Any]) -> Iterable[tuple[str, Any]]:
     compare = surface.get("compare", {})
     if not isinstance(compare, dict):
         raise ConfigError(f"surface.compare 不是对象: {surface.get('id')}")
+    if "whole" in compare:
+        yield "__self__", compare["whole"]
+        return
+    if "fields" in compare:
+        fields = compare["fields"]
+        if not isinstance(fields, dict):
+            raise ConfigError(f"surface.compare.fields 不是对象: {surface.get('id')}")
+        for field, configuration in fields.items():
+            yield field, configuration
+        return
+
+    # v1 compatibility. This path is intentionally not used for v2 contracts.
+    if "mode" in compare:
+        yield "__self__", compare
+    else:
+        yield from compare.items()
+
+
+def _compare_surface(source_value: Any, target_value: Any, surface: dict[str, Any]) -> list[dict[str, Any]]:
     comparisons: list[dict[str, Any]] = []
-    # A whole-observed comparator is useful for command/snapshot adapters.
-    if "mode" in compare and len(compare) == 1:
-        mode, normalization = _comparator(compare)
-        passed = source_value is not MISSING and target_value is not MISSING and compare_values(source_value, target_value, mode)
-        comparisons.append({"field": "__self__", "mode": mode, "normalization": normalization, "passed": passed})
-        return comparisons
-    for field, configuration in compare.items():
+    for field, configuration in _comparison_entries(surface):
         mode, normalization = _comparator(configuration)
+        if field == "__self__":
+            passed = source_value is not MISSING and target_value is not MISSING and compare_values(
+                source_value, target_value, mode, normalization
+            )
+            comparisons.append(
+                {"field": field, "mode": mode, "normalization": normalization, "passed": passed}
+            )
+            continue
         source_has = isinstance(source_value, dict) and field in source_value
         target_has = isinstance(target_value, dict) and field in target_value
         passed = (
             source_has
             and target_has
-            and compare_values(source_value[field], target_value[field], mode)
+            and compare_values(source_value[field], target_value[field], mode, normalization)
         )
         comparisons.append(
             {
@@ -110,6 +134,7 @@ def compare(
     corpus: dict[str, Any],
     *,
     expect_mismatch: bool = False,
+    expected_cases: set[str] | None = None,
 ) -> dict[str, Any]:
     source_results = result_map(source_document, "cases")
     target_results = result_map(target_document, "cases")
@@ -120,8 +145,11 @@ def compare(
     comparisons: list[dict[str, Any]] = []
     source_invalid = False
     for case in cases:
+        if not isinstance(case, dict):
+            raise ConfigError("parity corpus case 必须是对象")
         case_id = case["id"]
         surface_id = case["surface_id"]
+        operation_id = case.get("operation_id")
         required = case.get("required", True)
         surface = surfaces.get(surface_id)
         if surface is None:
@@ -142,6 +170,10 @@ def compare(
             passed = False
             source_invalid = source_invalid or bool(required)
             reason = "source-surface-mismatch"
+        elif operation_id is not None and source_item.get("operation_id") not in (None, operation_id):
+            passed = False
+            source_invalid = source_invalid or bool(required)
+            reason = "source-operation-mismatch"
         elif target_item is None:
             passed = False
             reason = "missing-target-case"
@@ -151,6 +183,9 @@ def compare(
         elif target_item.get("surface_id") not in (None, surface_id):
             passed = False
             reason = "target-surface-mismatch"
+        elif operation_id is not None and target_item.get("operation_id") not in (None, operation_id):
+            passed = False
+            reason = "target-operation-mismatch"
         else:
             source_value = _observed(source_item)
             target_value = _observed(target_item)
@@ -162,28 +197,52 @@ def compare(
             {
                 "id": case_id,
                 "surface_id": surface_id,
+                "operation_id": operation_id,
                 "required": required,
                 "passed": passed,
                 "reason": reason,
                 "comparisons": field_comparisons,
             }
         )
+
     required_failed = [item["id"] for item in comparisons if item["required"] and not item["passed"]]
     optional_failed = [item["id"] for item in comparisons if not item["required"] and not item["passed"]]
     mismatch_detected = bool(required_failed or optional_failed)
     source_valid = not source_invalid
+    targeted_mismatches: list[str] = []
+    targeted_failures: list[str] = []
+    if expected_cases:
+        by_id = {item["id"]: item for item in comparisons}
+        for case_id in sorted(expected_cases):
+            item = by_id.get(case_id)
+            if item is None:
+                targeted_failures.append(case_id)
+            elif item["required"] is not True or item["passed"]:
+                targeted_failures.append(case_id)
+            else:
+                targeted_mismatches.append(case_id)
+        targeted_control_passed = source_valid and not targeted_failures and bool(targeted_mismatches)
+    else:
+        targeted_control_passed = None
+
     if expect_mismatch:
-        status = "negative_control_passed" if source_valid and mismatch_detected else "negative_control_failed"
+        if expected_cases:
+            status = "negative_control_passed" if targeted_control_passed else "negative_control_failed"
+        else:
+            # Kept for old callers, but validate_judge.py refuses an unscoped
+            # negative control as evidence of a valid Judge.
+            status = "negative_control_passed" if source_valid and mismatch_detected else "negative_control_failed"
         passed = status == "negative_control_passed"
     else:
         status = "passed" if source_valid and not required_failed else "failed"
         passed = status == "passed"
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": status,
         "negative_control": expect_mismatch,
+        "negative_control_scoped": bool(expected_cases),
         "negative_control_passed": status == "negative_control_passed" if expect_mismatch else None,
-        "source_valid": not source_invalid,
+        "source_valid": source_valid,
         "cases": comparisons,
         "summary": {
             "total": len(comparisons),
@@ -192,6 +251,10 @@ def compare(
             "required_failed": required_failed,
             "optional_failed": optional_failed,
             "mismatch_detected": mismatch_detected,
+            "expected_mismatch_cases": sorted(expected_cases or set()),
+            "detected_mismatch_cases": targeted_mismatches,
+            "targeted_mismatch_failures": targeted_failures,
+            "targeted_control_passed": targeted_control_passed,
         },
         "passed": passed,
     }
@@ -208,7 +271,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--expect-mismatch",
         action="store_true",
-        help="negative control: pass only when a required mismatch is detected",
+        help="negative control; combine with --expect-case for targeted validation",
+    )
+    parser.add_argument(
+        "--expect-case",
+        action="append",
+        default=[],
+        help="required case id that the mutation must make fail; repeatable",
     )
     return parser
 
@@ -227,6 +296,7 @@ def main(argv: list[str] | None = None) -> int:
         contract,
         corpus,
         expect_mismatch=args.expect_mismatch,
+        expected_cases=set(args.expect_case),
     )
     report["freeze_intact"] = freeze["intact"]
     write_json(args.output, report)

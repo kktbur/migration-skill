@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "cases": [
+    {
+      "id": "hello",
+      "surface_id": "main-cli",
+      "operation_id": "hello",
+      "input": {"argv": ["--name", "Ada"]},
+      "required": true
+    },
+    {
+      "id": "boundary-empty",
+      "surface_id": "main-cli",
+      "operation_id": "boundary-empty",
+      "input": {"argv": ["--name", ""]},
+      "required": true
+    },
+    {
+      "id": "error",
+      "surface_id": "main-cli",
+      "operation_id": "error",
+      "input": {"argv": ["--unknown"]},
+      "required": true
+    }
+  ]
+}

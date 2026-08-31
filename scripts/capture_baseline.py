@@ -53,13 +53,32 @@ def capture(root: Path, spec: Any, profile: str, output_limit: int = 20000) -> d
         if check_id in seen:
             raise ConfigError(f"checks 包含重复 id: {check_id}")
         seen.add(check_id)
-        results.append(run_check(root, check, {}, output_limit))
+        results.append(
+            run_check(
+                root,
+                check,
+                {},
+                output_limit,
+                spec.get("environment") if isinstance(spec, dict) else None,
+            )
+        )
     digest_after = tree_digest(root)
     revision_after = git_revision(root)
     summary = summarize_results(results)
     inherited_failures = [
         result["id"] for result in results if result.get("status") != "passed"
     ]
+    source_changed = digest_before != digest_after or revision_before != revision_after
+    execution_failures = [
+        result["id"]
+        for result in results
+        if result.get("execution_error")
+    ]
+    capture_status = "captured_with_inherited_failures" if inherited_failures else "captured_clean"
+    if execution_failures:
+        capture_status = "capture_failed"
+    if source_changed:
+        capture_status = "source_changed_during_capture"
     return {
         "schema_version": 1,
         "profile": profile,
@@ -68,11 +87,13 @@ def capture(root: Path, spec: Any, profile: str, output_limit: int = 20000) -> d
         "revision_after_checks": revision_after,
         "tree_digest": digest_before,
         "tree_digest_after_checks": digest_after,
-        "source_changed_during_baseline": digest_before != digest_after or revision_before != revision_after,
+        "source_changed_during_baseline": source_changed,
         "checks": results,
         "results": results,
         "summary": summary,
         "inherited_failures": inherited_failures,
+        "execution_failures": execution_failures,
+        "status": capture_status,
         "runner": now_environment_summary(),
         "policy": "Existing failures are recorded as inherited; later evaluation checks only for new regressions.",
     }
@@ -85,6 +106,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", required=True, help="baseline JSON output")
     parser.add_argument("--profile", choices=("source", "target"), default="source")
     parser.add_argument("--output-limit", type=int, default=20000)
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="return 1 when checks have inherited failures; default capture mode returns 0",
+    )
     return parser
 
 
@@ -95,7 +121,13 @@ def main(argv: list[str] | None = None) -> int:
     spec = load_json(args.spec)
     report = capture(Path(args.root), spec, args.profile, args.output_limit)
     write_json(args.output, report)
-    return EXIT_OK if report["summary"]["all_required_passed"] else EXIT_FAILED
+    if report["status"] == "source_changed_during_capture":
+        return EXIT_FAILED
+    if report["status"] == "capture_failed":
+        return EXIT_FAILED
+    if args.strict and report["inherited_failures"]:
+        return EXIT_FAILED
+    return EXIT_OK
 
 
 if __name__ == "__main__":
@@ -104,4 +136,3 @@ if __name__ == "__main__":
     except ConfigError as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(EXIT_INVALID)
-

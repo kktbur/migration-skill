@@ -1,12 +1,24 @@
 # Behavior Contract and Parity Corpus
 
-The machine-readable contract is `migration.json`, not YAML. It uses ordinary JSON so the helper scripts remain standard-library-only.
+The machine-readable contract is `migration.json`, not YAML. The current format is schema version 2 and uses only JSON so the deterministic helpers remain standard-library-only.
+
+## Contract versus corpus
+
+The Contract answers:
+
+> Which observable behaviors must remain stable?
+
+The Corpus answers:
+
+> Which concrete inputs will exercise those behaviors?
+
+Do not put expected output, comparison rules, or ad-hoc tolerances in the Corpus. Those belong to the Contract. The adapter describes how to start an implementation; the runner sends each Corpus case to the adapter.
 
 ## Contract shape
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": {
     "root": ".",
     "revision": "AUTO",
@@ -17,27 +29,48 @@ The machine-readable contract is `migration.json`, not YAML. It uses ordinary JS
   "target": {
     "root": "../target",
     "language": "Node.js",
-    "framework": "Express"
+    "framework": "Express",
+    "entrypoints": ["server.js"]
+  },
+  "environment": {
+    "set": {"NODE_ENV": "test"}
   },
   "public_surfaces": [
     {
-      "id": "main-http",
+      "id": "public-http",
       "kind": "http",
-      "description": "Health endpoint",
       "required": true,
       "source_adapter": {
         "kind": "harness",
-        "argv": ["python", "tests/parity/http_adapter.py", "--implementation", "source"]
+        "argv": ["python", "tests/parity/http_adapter.py"]
       },
       "target_adapter": {
         "kind": "harness",
-        "argv": ["python", "tests/parity/http_adapter.py", "--implementation", "target"]
+        "argv": ["python", "tests/parity/http_adapter.py"]
       },
-      "compare": {"status": true, "body": "json-semantic"},
-      "evidence": ["tests/test_api.py"],
-      "confidence": "high"
+      "compare": {
+        "fields": {
+          "status": {"mode": "exact"},
+          "body": {"mode": "json-semantic"}
+        }
+      },
+      "evidence": ["app/routes.py", "tests/test_api.py"],
+      "confidence": "high",
+      "operations": [
+        {
+          "id": "GET-/health",
+          "required": true,
+          "evidence": [
+            {"path": "app/routes.py", "type": "route-definition", "line": 12},
+            {"path": "tests/test_api.py", "type": "existing-test"}
+          ]
+        }
+      ]
     }
   ],
+  "completion_gates": {
+    "required_check_kinds": ["test"]
+  },
   "checks": {
     "source": [],
     "target": []
@@ -46,34 +79,51 @@ The machine-readable contract is `migration.json`, not YAML. It uses ordinary JS
 }
 ```
 
-Required top-level fields are `schema_version`, `source`, `target`, `public_surfaces`, and `parity_corpus`. `checks` may be a single list or an object with `source` and `target` lists.
+Every v2 required operation needs non-empty evidence. Evidence may be a repository-relative path or an object with `path`, `type`, and an optional positive `line`. This makes Codex's operation enumeration auditable without requiring a parser for every framework.
 
-Each check has:
+Supported public surface kinds are `command`, `http`, `library`, `snapshot`, and `file-io`. Each surface has a portable Source adapter and Target adapter. Both adapters must use an explicit argv array; shell strings and `shell: true` are rejected.
+
+## Environment policy
+
+Checks and adapters receive a minimal environment by default. The host environment is not copied wholesale. A Contract may explicitly declare non-secret names to inherit or values to set:
 
 ```json
-    {
-      "id": "unit-tests",
-      "kind": "test",
-      "argv": ["python", "-m", "unittest"],
-      "cwd": ".",
-      "env": {},
-      "timeout_seconds": 300,
-      "expected_exit_code": 0,
-      "required": true
+{
+  "environment": {
+    "inherit": ["NODE_ENV"],
+    "set": {"LANG": "C.UTF-8"}
+  }
 }
 ```
 
-Commands are argv arrays. Do not use implicit shell strings. Environment values are never written to result files; do not put secrets in the command or contract.
+Names that look like keys, tokens, passwords, credentials, or private keys are rejected. A real integration test that needs a secret must use an authorized external sandbox and must not put the secret in the Contract, logs, or results.
+
+## Checks
+
+```json
+{
+  "id": "unit-tests",
+  "kind": "test",
+  "argv": ["python", "-m", "unittest"],
+  "cwd": ".",
+  "timeout_seconds": 300,
+  "expected_exit_code": 0,
+  "required": true
+}
+```
+
+Only configured required check kinds are completion gates. For example, a small CLI may require `test` and `parity` without inventing a separate build/static command. Individual checks marked `required: true` still have to pass.
 
 ## Corpus shape
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "cases": [
     {
-      "id": "health-ok",
-      "surface_id": "main-http",
+      "id": "health",
+      "surface_id": "public-http",
+      "operation_id": "GET-/health",
       "input": {
         "method": "GET",
         "path": "/health"
@@ -84,25 +134,47 @@ Commands are argv arrays. Do not use implicit shell strings. Environment values 
 }
 ```
 
-Supported surface kinds are `command`, `http`, `library`, `snapshot`, and `file-io`. The corpus describes inputs only; the adapter or harness describes how to execute them and returns case records such as:
+The same case is sent to Source and Target by `scripts/run_parity.py`. An adapter receives:
 
 ```json
 {
-  "cases": [
-    {
-      "id": "health-ok",
-      "surface_id": "main-http",
-      "status": "passed",
-      "observed": {"status": 200, "body": {"ok": true}}
-    }
-  ]
+  "case_id": "health",
+  "surface_id": "public-http",
+  "operation_id": "GET-/health",
+  "input": {"method": "GET", "path": "/health"}
 }
 ```
 
-Do not put expected output, comparison rules, or normalization rules in the corpus. Those belong to the Contract and its freeze manifest.
+It must emit one JSON object on stdout with `status: "passed"` and an `observed` value. The `observed` value is compared by the frozen surface comparator.
 
-Supported comparison modes are `exact`, `text-normalized`, `json-semantic`, `exit-code`, and `snapshot`. A `true` comparator means `exact`. JSON semantic comparison ignores object key order but does not ignore missing fields, changed types, or `null` versus absent.
+## Comparison modes
+
+Schema v2 uses one unambiguous comparator shape:
+
+```json
+{"whole": {"mode": "json-semantic"}}
+```
+
+or:
+
+```json
+{
+  "fields": {
+    "status": {"mode": "exact"},
+    "body": {
+      "mode": "text-normalized",
+      "normalization": ["crlf-to-lf", "trim-trailing-whitespace"]
+    }
+  }
+}
+```
+
+Supported modes are `exact`, `text`, `text-normalized`, `json-semantic`, `exit-code`, and `snapshot`. JSON semantic comparison ignores object key order but does not ignore missing fields, changed types, or `null` versus absent. Normalization is explicit and is applied by the comparator, not merely recorded in the contract.
+
+Schema v1 remains readable for compatibility, but its surface-only coverage cannot establish a fully verified v2 migration. New contracts should use schema v2.
 
 ## Freeze rule
 
-After the source positive-control and mutation negative-control runs pass, freeze the contract, corpus, evaluator, check specification, and source revision. If any frozen asset changes, rerun validation and freeze instead of silently continuing.
+First run the positive Source Judge, then run targeted negative controls against deliberately mutated required cases. `scripts/validate_judge.py` produces the only accepted Judge artifact. `scripts/freeze_contract.py` then freezes the Source revision/tree digest, Contract, Corpus, Judge artifact, check specification, normalization policy, and every Python file in the verifier bundle.
+
+After Freeze, do not remove a required case or operation, lower its required flag, widen a comparator, or edit verifier code to make a migration pass. Revalidate and create a new Freeze only after explicit approval.

@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.migration/
+*.local.json
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
