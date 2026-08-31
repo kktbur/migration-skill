@@ -78,7 +78,7 @@ inventory_project.py --root PATH --output PATH
 validate_contract.py --contract PATH --corpus PATH
 capture_baseline.py --root PATH --spec PATH --output PATH [--profile source]
 run_parity.py --root PATH --contract PATH --corpus PATH --profile source|target --output PATH
-compare_results.py --source PATH --target PATH --contract PATH --corpus PATH --manifest PATH --output PATH
+compare_results.py --source PATH --target PATH --contract PATH --corpus PATH --output PATH [--manifest PATH | --pre-freeze]
 validate_judge.py --positive PATH --mutation-plan PATH --output PATH [--root PATH]
 freeze_contract.py --root PATH --contract PATH --corpus PATH --evaluator PATH --judge-validation PATH --output PATH
 run_checks.py --root PATH --spec PATH --output PATH [--profile source|target] [--var KEY=VALUE]

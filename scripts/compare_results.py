@@ -266,7 +266,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--target", required=True, help="target adapter result JSON")
     parser.add_argument("--contract", required=True, help="migration.json")
     parser.add_argument("--corpus", required=True, help="parity-corpus.json")
-    parser.add_argument("--manifest", required=True, help="freeze-manifest.json")
+    parser.add_argument("--manifest", help="freeze-manifest.json; required after Freeze")
     parser.add_argument("--output", required=True, help="parity-result.json")
     parser.add_argument(
         "--expect-mismatch",
@@ -279,12 +279,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         help="required case id that the mutation must make fail; repeatable",
     )
+    parser.add_argument(
+        "--pre-freeze",
+        action="store_true",
+        help="bootstrap Judge validation before a freeze manifest exists",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    freeze = verify_freeze(args.manifest)
+    if args.pre_freeze:
+        if args.manifest:
+            raise ConfigError("--pre-freeze 不能同时提供 --manifest")
+        freeze_intact = False
+    else:
+        if not args.manifest:
+            raise ConfigError("冻结后的比较必须提供 --manifest；Judge bootstrap 请使用 --pre-freeze")
+        freeze_intact = verify_freeze(args.manifest)["intact"]
     contract = load_json(args.contract)
     corpus = load_json(args.corpus)
     errors = validate_documents(contract, corpus)
@@ -298,7 +310,7 @@ def main(argv: list[str] | None = None) -> int:
         expect_mismatch=args.expect_mismatch,
         expected_cases=set(args.expect_case),
     )
-    report["freeze_intact"] = freeze["intact"]
+    report["freeze_intact"] = freeze_intact
     write_json(args.output, report)
     return EXIT_OK if report["passed"] else EXIT_FAILED
 

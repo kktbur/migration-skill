@@ -63,16 +63,16 @@ python scripts/run_parity.py --root SOURCE --contract .migration/migration.json 
   --output .migration/results/source-parity.json
 ```
 
-The positive Judge can compare Source against itself, or compare it with a separately portable expected artifact. Then create a mutation plan whose entries identify the required case each deliberate mutation must break. Run the mutated Source/Target adapter and compare it with:
+The positive Judge can compare Source against itself, or compare it with a separately portable expected artifact. Then create a mutation plan whose entries identify the required case each deliberate mutation must break. Before Freeze, use the explicit bootstrap mode to compare the mutated result:
 
 ```text
 python scripts/compare_results.py --source source-parity.json --target mutated-parity.json \
   --contract .migration/migration.json --corpus .migration/parity-corpus.json \
-  --manifest .migration/freeze-manifest.json --output negative-control.json \
-  --expect-mismatch --expect-case health
+  --output negative-control.json --expect-mismatch --expect-case health \
+  --pre-freeze
 ```
 
-Before Freeze, the manifest does not exist yet; the first Judge comparison may use the public `compare` function or a temporary manifest generated after the positive control. The important property is that the negative control names a required case and actually fails that case.
+After Freeze, every normal parity comparison must provide `--manifest`; the pre-freeze flag is deliberately explicit and its result cannot be used as a final migration result without rerunning the comparison against the frozen bundle.
 
 Validate the controls:
 
