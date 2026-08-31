@@ -228,14 +228,16 @@ class MigrationScriptsTest(unittest.TestCase):
         judge = validate_judge(positive_path, plan_path, judge_path, source_root=source)
         self.assertTrue(judge["valid"], judge)
         manifest_path = base / "freeze-manifest.json"
+        verifier_root = base / "verifier"
+        shutil.copytree(SCRIPT_ROOT, verifier_root)
         manifest = freeze(
             source,
             contract_path,
             corpus_path,
-            SCRIPT_ROOT / "evaluate_migration.py",
+            verifier_root / "evaluate_migration.py",
             manifest_path,
             judge_path,
-            SCRIPT_ROOT,
+            verifier_root,
         )
         baseline = capture(source, contract, "source")
         source_checks = run_checks(source, contract, "source", {}, 20000)
@@ -440,39 +442,14 @@ class MigrationScriptsTest(unittest.TestCase):
                 tampered["target"]["framework"] = "tampered"
                 write_json(fixture["contract_path"], tampered)
                 verify_freeze(fixture["manifest_path"])
+            original_contract = json.loads(fixture["contract_path"].read_text(encoding="utf-8"))
+            original_contract["target"]["framework"] = "CLI"
+            write_json(fixture["contract_path"], original_contract)
+            (fixture["base"] / "verifier" / "common.py").write_text("tampered\n", encoding="utf-8")
+            with self.assertRaises(FrozenStateError):
+                verify_freeze(fixture["manifest_path"])
         finally:
             fixture["temporary"].cleanup()
-
-        with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary)
-            verifier = base / "verifier"
-            shutil.copytree(SCRIPT_ROOT, verifier)
-            source = base / "source"
-            source.mkdir()
-            contract = self._v2_contract([], [])
-            corpus = self._v2_corpus()
-            contract_path = base / "migration.json"
-            corpus_path = base / "parity-corpus.json"
-            judge_path = base / "judge.json"
-            manifest_path = base / "freeze.json"
-            write_json(contract_path, contract)
-            write_json(corpus_path, corpus)
-            write_json(
-                judge_path,
-                {
-                    "schema_version": 1,
-                    "artifact_type": "judge-validation-v1",
-                    "generated_by": "validate_judge.py",
-                    "positive_control": True,
-                    "negative_controls": [{"mutation_id": "m", "expected_case": "x", "result_sha256": "sha256:x", "detected": True}],
-                    "negative_control": True,
-                    "valid": True,
-                },
-            )
-            freeze(source, contract_path, corpus_path, verifier / "evaluate_migration.py", manifest_path, judge_path, verifier)
-            (verifier / "common.py").write_text("tampered\n", encoding="utf-8")
-            with self.assertRaises(FrozenStateError):
-                verify_freeze(manifest_path)
 
     def test_baseline_inherited_failure_is_capture_success_and_strict_is_failure(self):
         with tempfile.TemporaryDirectory() as temporary:

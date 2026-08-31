@@ -84,6 +84,19 @@ def validate_artifact(document: Any) -> list[str]:
         errors.append("judge-validation.artifact_type 不受支持")
     if document.get("generated_by") != "validate_judge.py":
         errors.append("judge-validation.generated_by 不正确")
+    for key in (
+        "source_revision",
+        "source_tree_digest",
+        "positive_result_path",
+        "positive_result_sha256",
+        "mutation_plan_path",
+        "mutation_plan_sha256",
+    ):
+        if key not in document or not isinstance(document.get(key), (str, type(None))):
+            errors.append(f"judge-validation.{key} 缺失或类型无效")
+    for key in ("positive_result_path", "positive_result_sha256", "mutation_plan_path", "mutation_plan_sha256"):
+        if not isinstance(document.get(key), str) or not document.get(key):
+            errors.append(f"judge-validation.{key} 必须是非空字符串")
     if document.get("positive_control") is not True:
         errors.append("positive_control 未通过")
     controls = document.get("negative_controls")
@@ -97,6 +110,8 @@ def validate_artifact(document: Any) -> list[str]:
             for key in ("mutation_id", "expected_case", "result_sha256"):
                 if not isinstance(control.get(key), str) or not control.get(key):
                     errors.append(f"negative_controls[{index}].{key} 无效")
+            if not isinstance(control.get("result_path"), str) or not control.get("result_path"):
+                errors.append(f"negative_controls[{index}].result_path 无效")
             if control.get("detected") is not True:
                 errors.append(f"negative_controls[{index}] 未检测到目标 mutation")
     if document.get("negative_control") is not True:

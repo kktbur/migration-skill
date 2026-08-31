@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,7 @@ try:
         write_json,
     )
     from validate_contract import validate_files
-    from validate_judge import validate_artifact
+    from validate_judge import validate_artifact, validate_judge
 except ImportError:  # pragma: no cover
     from .common import (
         ConfigError,
@@ -41,7 +42,7 @@ except ImportError:  # pragma: no cover
         write_json,
     )
     from .validate_contract import validate_files
-    from .validate_judge import validate_artifact
+    from .validate_judge import validate_artifact, validate_judge
 
 
 def _required_file(path_value: str, label: str) -> Path:
@@ -58,6 +59,32 @@ def _file_entry(path: Path) -> dict[str, str]:
 def _bundle_entries(root: Path) -> dict[str, dict[str, str]]:
     paths = _bundle_files(root)
     return {label: _file_entry(path) for label, path in paths.items()}
+
+
+def _revalidate_judge_artifact(
+    artifact: dict[str, Any],
+    source_root: Path,
+    source_revision: str | None,
+) -> None:
+    """Recompute the Judge artifact so a forged pair of flags cannot freeze."""
+
+    positive_path = _required_file(artifact["positive_result_path"], "judge positive result")
+    mutation_plan_path = _required_file(artifact["mutation_plan_path"], "mutation plan")
+    if sha256_file(positive_path) != artifact["positive_result_sha256"]:
+        raise ConfigError("judge-validation positive result 摘要不匹配")
+    if sha256_file(mutation_plan_path) != artifact["mutation_plan_sha256"]:
+        raise ConfigError("judge-validation mutation plan 摘要不匹配")
+    with tempfile.TemporaryDirectory(prefix="migration-judge-") as temporary:
+        recomputed_path = Path(temporary) / "judge-validation.json"
+        recomputed = validate_judge(
+            positive_path,
+            mutation_plan_path,
+            recomputed_path,
+            source_revision=source_revision,
+            source_root=source_root,
+        )
+    if recomputed != artifact:
+        raise ConfigError("judge-validation 不是由当前 positive result/mutation plan 重新验证得到的 artifact")
 
 
 def freeze(
@@ -90,8 +117,9 @@ def freeze(
     actual_tree_digest = tree_digest(root)
     if judge_validation.get("source_revision") != actual_revision:
         raise ConfigError("judge-validation 的 source_revision 与当前 Source 不一致")
-    if judge_validation.get("source_tree_digest") not in {None, actual_tree_digest}:
+    if judge_validation.get("source_tree_digest") != actual_tree_digest:
         raise ConfigError("judge-validation 的 source_tree_digest 与当前 Source 不一致")
+    _revalidate_judge_artifact(judge_validation, root, actual_revision)
 
     bundle_root = (verifier_root or evaluator_path.parent).resolve()
     bundle_files = _bundle_entries(bundle_root)
