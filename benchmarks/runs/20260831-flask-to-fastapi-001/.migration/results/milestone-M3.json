@@ -1,0 +1,206 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "M1 and M2 proof remains passing",
+      "all required parity cases pass",
+      "the final target test suite passes"
+    ],
+    "depends_on": [
+      "M2"
+    ],
+    "expected_behavior": [
+      "Creation preserves valid, default, validation, duplicate, and malformed JSON behavior.",
+      "Deletion preserves success, missing-user, and invalid-id behavior."
+    ],
+    "files": [
+      "app.py",
+      "adapter.py",
+      "test_api.py"
+    ],
+    "id": "M3",
+    "name": "User creation and deletion behavior",
+    "required_cases": [
+      "create-user",
+      "create-no-age",
+      "create-missing-name",
+      "create-empty-name",
+      "create-whitespace-name",
+      "create-invalid-age",
+      "create-bool-age",
+      "create-null-name",
+      "create-invalid-json",
+      "create-duplicate-user",
+      "delete-existing",
+      "delete-missing",
+      "delete-invalid-id"
+    ],
+    "required_checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "rollback_boundary": "target checkpoint after M2",
+    "scope": [
+      "POST /users",
+      "DELETE /users/:id",
+      "validation, duplicate, and empty-success behavior"
+    ],
+    "verification_command": "run_checks.py --profile target followed by run_parity.py and evaluate_milestone.py"
+  },
+  "milestone_id": "M3",
+  "plan_digest": "sha256:b9012eeb75daed4dd62c38eac75098bd0a164df19d986e4ce8cdba8d6718b227",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "create-bool-age",
+      "create-duplicate-user",
+      "create-empty-name",
+      "create-invalid-age",
+      "create-invalid-json",
+      "create-missing-name",
+      "create-no-age",
+      "create-null-name",
+      "create-user",
+      "create-whitespace-name",
+      "delete-existing",
+      "delete-invalid-id",
+      "delete-missing",
+      "health",
+      "search-empty",
+      "search-no-match",
+      "search-normal",
+      "search-unicode",
+      "user-found",
+      "user-invalid-id",
+      "user-missing"
+    ],
+    "checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "health",
+      "search-empty",
+      "search-no-match",
+      "search-normal",
+      "search-unicode",
+      "user-found",
+      "user-invalid-id",
+      "user-missing"
+    ],
+    "required": [
+      "health",
+      "search-empty",
+      "search-no-match",
+      "search-normal",
+      "search-unicode",
+      "user-found",
+      "user-invalid-id",
+      "user-missing"
+    ]
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "required": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "create-bool-age",
+      "create-duplicate-user",
+      "create-empty-name",
+      "create-invalid-age",
+      "create-invalid-json",
+      "create-missing-name",
+      "create-no-age",
+      "create-null-name",
+      "create-user",
+      "create-whitespace-name",
+      "delete-existing",
+      "delete-invalid-id",
+      "delete-missing"
+    ],
+    "required": [
+      "create-bool-age",
+      "create-duplicate-user",
+      "create-empty-name",
+      "create-invalid-age",
+      "create-invalid-json",
+      "create-missing-name",
+      "create-no-age",
+      "create-null-name",
+      "create-user",
+      "create-whitespace-name",
+      "delete-existing",
+      "delete-invalid-id",
+      "delete-missing"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "required": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": "<benchmark-run>\\generated-target",
+    "tree_digest": "sha256:758bfee64da27b5edf08c7090e1a360c58af6aafc92a40a905d518ae330c4d4c"
+  }
+}

@@ -125,7 +125,7 @@ GitHub Actions runs these checks on both Ubuntu and Windows. Tests use `unittest
 
 ## Benchmarks and limits
 
-The benchmark plan covers Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM. Benchmark cases are blind: they publish Source, Contract, Corpus, plan, and mutation metadata but no pre-made Target. The first complete Python CLI → Node CLI run is published at [`benchmarks/runs/20260831-python-cli-to-node-cli-001/`](benchmarks/runs/20260831-python-cli-to-node-cli-001/) with a `VERIFIED` verdict and broken-Target rejection. See [`benchmarks/README.md`](benchmarks/README.md).
+The benchmark plan covers Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM. Benchmark cases are blind: they publish Source, Contract, Corpus, plan, and mutation metadata but no pre-made Target. Complete Python CLI → Node CLI and Flask → FastAPI runs are published at [`benchmarks/runs/20260831-python-cli-to-node-cli-001/`](benchmarks/runs/20260831-python-cli-to-node-cli-001/) and [`benchmarks/runs/20260831-flask-to-fastapi-001/`](benchmarks/runs/20260831-flask-to-fastapi-001/), each with a `VERIFIED` verdict and broken-Target rejection. CommonJS → ESM remains specification-only. See [`benchmarks/README.md`](benchmarks/README.md).
 
 Out of scope for v1 are production deployment, production database writes, cloud mutation, a GUI, a long-running Agent Runtime, a GitHub PR bot, automatic network isolation, arbitrary monorepo one-click migration, and in-place migration without a branch/worktree boundary.
 

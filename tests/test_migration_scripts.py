@@ -408,6 +408,21 @@ class MigrationScriptsTest(unittest.TestCase):
             self.assertEqual(negative["status"], "negative_control_passed")
             self.assertEqual(negative["summary"]["detected_mismatch_cases"], ["hello"])
 
+    def test_parity_runner_transports_unicode_cases_safely(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            source, _, contract, corpus, _, _ = self._write_cli_fixture(base)
+            corpus["cases"][0]["input"]["argv"] = ["--name", "张三"]
+
+            result = run_parity(source, contract, corpus, "source")
+
+            self.assertEqual(result["status"], "passed")
+            self.assertEqual(result["summary"]["passed"], 3)
+            self.assertEqual(
+                result["cases"][0]["observed"]["stdout"],
+                {"greeting": "hello 张三"},
+            )
+
     def test_validate_judge_rejects_fake_or_unscoped_negative_control(self):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)

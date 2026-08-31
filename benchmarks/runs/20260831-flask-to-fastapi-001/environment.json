@@ -1,0 +1,12 @@
+{
+  "benchmark_date": "2026-08-31",
+  "platform": "Windows",
+  "python": "3.12.13",
+  "flask": "3.1.3",
+  "fastapi": "0.141.1",
+  "httpx": "0.28.1",
+  "node": "not required",
+  "execution_mode": "local isolated virtual environment",
+  "network": "dependency installation only; benchmark execution used local framework test clients",
+  "credentials": "not provided"
+}

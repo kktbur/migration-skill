@@ -1,0 +1,83 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-p",
+        "test_api.py",
+        "-q"
+      ],
+      "cwd": "<benchmark-run>\\source",
+      "duration_seconds": 0.267623,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 21 tests in 0.030s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "execution_failures": [],
+  "inherited_failures": [],
+  "policy": "Existing failures are recorded as inherited; later evaluation checks only for new regressions.",
+  "profile": "source",
+  "results": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-p",
+        "test_api.py",
+        "-q"
+      ],
+      "cwd": "<benchmark-run>\\source",
+      "duration_seconds": 0.267623,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 21 tests in 0.030s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "revision": null,
+  "revision_after_checks": null,
+  "root": "<benchmark-run>\\source",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "source_changed_during_baseline": false,
+  "status": "captured_clean",
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  },
+  "tree_digest": "sha256:1548ff2c2f29d35e359e09cc3d686d86a84c83d764c59696072a02ff91255d64",
+  "tree_digest_after_checks": "sha256:1548ff2c2f29d35e359e09cc3d686d86a84c83d764c59696072a02ff91255d64"
+}

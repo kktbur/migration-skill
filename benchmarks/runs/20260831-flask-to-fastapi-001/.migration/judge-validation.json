@@ -1,0 +1,45 @@
+{
+  "artifact_type": "judge-validation-v1",
+  "generated_by": "validate_judge.py",
+  "mutation_plan_path": ".migration/mutation-plan.json",
+  "mutation_plan_sha256": "sha256:79a7729b44c8d69aed90e6d19b91e0781082580765a2cac77cd2f12a8beeb8bc",
+  "negative_control": true,
+  "negative_controls": [
+    {
+      "detected": true,
+      "expected_case": "user-missing",
+      "expected_operation": "GET-/users/:id",
+      "mutation_id": "missing-user-404-to-200",
+      "reason": null,
+      "result_path": ".migration/results/negative-user-missing-compare.json",
+      "result_sha256": "sha256:f1b1dfd71dd27b91ad880c620202a1ccac81650d00e0b0711287082a87d417c1"
+    },
+    {
+      "detected": true,
+      "expected_case": "create-missing-name",
+      "expected_operation": "POST-/users",
+      "mutation_id": "missing-name-400-to-422",
+      "reason": null,
+      "result_path": ".migration/results/negative-create-user-compare.json",
+      "result_sha256": "sha256:5497cb378521aa3023d618f81d40908afda64f0b4436478f5848d2b34395dc10"
+    },
+    {
+      "detected": true,
+      "expected_case": "user-found",
+      "expected_operation": "GET-/users/:id",
+      "mutation_id": "drop-user-name-field",
+      "reason": null,
+      "result_path": ".migration/results/negative-drop-user-field-compare.json",
+      "result_sha256": "sha256:726535f6fbf5171e5458ac2028fbd187a5a10bd1a4e45c9e3566b1566b8f53cb"
+    }
+  ],
+  "path_mode": "relative",
+  "positive_control": true,
+  "positive_result_path": ".migration/results/positive-source.json",
+  "positive_result_sha256": "sha256:9b158ac844d2f8f06926800235cc3bf2beaa457fcf396f2e91427d6375860635",
+  "schema_version": 1,
+  "source_revision": null,
+  "source_tree_digest": "sha256:1548ff2c2f29d35e359e09cc3d686d86a84c83d764c59696072a02ff91255d64",
+  "valid": true,
+  "workspace_root": ".."
+}

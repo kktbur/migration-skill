@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "benchmark": "Flask to FastAPI",
+  "run_id": "20260831-flask-to-fastapi-001",
+  "final_status": "VERIFIED",
+  "source": {
+    "framework": "Flask",
+    "tests": 21,
+    "revision": null,
+    "tree_digest": "sha256:1548ff2c2f29d35e359e09cc3d686d86a84c83d764c59696072a02ff91255d64",
+    "unchanged_after_freeze": true
+  },
+  "target": {
+    "framework": "FastAPI",
+    "independent_generated_target": true,
+    "tree_digest": "sha256:758bfee64da27b5edf08c7090e1a360c58af6aafc92a40a905d518ae330c4d4c"
+  },
+  "contract": {
+    "public_operations": 5,
+    "required_cases": 21,
+    "required_check_kinds": ["test"],
+    "frozen_manifest_schema": 3,
+    "verifier_bundle_frozen": true
+  },
+  "judge": {
+    "positive_control": true,
+    "negative_controls": 3,
+    "negative_controls_detected": 3,
+    "valid": true
+  },
+  "milestones": {
+    "accepted": 3,
+    "total": 3,
+    "ids": ["M1", "M2", "M3"],
+    "verification_score": 1.0
+  },
+  "verification": {
+    "target_checks_passed": true,
+    "parity_passed": 21,
+    "parity_total": 21,
+    "required_parity_failed": [],
+    "source_new_regressions": [],
+    "status": "VERIFIED"
+  },
+  "broken_target_rejection": [
+    {
+      "mutation": "missing-user status 404 to 200",
+      "expected_case": "user-missing",
+      "status": "negative_control_passed"
+    },
+    {
+      "mutation": "missing-name status 400 to 422",
+      "expected_case": "create-missing-name",
+      "status": "negative_control_passed"
+    },
+    {
+      "mutation": "drop found-user name field",
+      "expected_case": "user-found",
+      "status": "negative_control_passed"
+    }
+  ],
+  "resume": {
+    "final_checkpoint": "ready",
+    "tampered_target": "invalidated"
+  },
+  "instrumentation": {
+    "repair_rounds": "not_instrumented",
+    "manual_interventions": "not_instrumented",
+    "elapsed_seconds": "not_instrumented",
+    "token_usage": "unavailable"
+  },
+  "observed_repairs": [
+    "Made parity stdin JSON ASCII-safe for Windows Unicode transport.",
+    "Removed Flask and FastAPI default content-type behavior from the frozen 204 contract.",
+    "Used header deletion compatible with Starlette MutableHeaders."
+  ]
+}

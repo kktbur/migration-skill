@@ -1,0 +1,308 @@
+{
+  "build_commands": [],
+  "candidate_operations": [
+    {
+      "confidence": "medium",
+      "evidence": [
+        {
+          "line": 82,
+          "path": "app.py",
+          "type": "route-definition"
+        }
+      ],
+      "id": "DELETE-/users/<int:user_id>",
+      "kind": "http",
+      "method": "DELETE",
+      "path": "/users/<int:user_id>"
+    },
+    {
+      "confidence": "medium",
+      "evidence": [
+        {
+          "line": 45,
+          "path": "app.py",
+          "type": "route-definition"
+        }
+      ],
+      "id": "GET-/health",
+      "kind": "http",
+      "method": "GET",
+      "path": "/health"
+    },
+    {
+      "confidence": "medium",
+      "evidence": [
+        {
+          "line": 92,
+          "path": "app.py",
+          "type": "route-definition"
+        }
+      ],
+      "id": "GET-/search",
+      "kind": "http",
+      "method": "GET",
+      "path": "/search"
+    },
+    {
+      "confidence": "medium",
+      "evidence": [
+        {
+          "line": 50,
+          "path": "app.py",
+          "type": "route-definition"
+        }
+      ],
+      "id": "GET-/users/<int:user_id>",
+      "kind": "http",
+      "method": "GET",
+      "path": "/users/<int:user_id>"
+    },
+    {
+      "confidence": "medium",
+      "evidence": [
+        {
+          "line": 58,
+          "path": "app.py",
+          "type": "route-definition"
+        }
+      ],
+      "id": "POST-/users",
+      "kind": "http",
+      "method": "POST",
+      "path": "/users"
+    }
+  ],
+  "ci": [],
+  "documentation": [],
+  "entrypoints": [
+    "app.py"
+  ],
+  "files": {
+    "by_extension": {
+      ".py": 3,
+      ".txt": 1
+    },
+    "total": 4
+  },
+  "frameworks": {
+    "FastAPI": {
+      "confidence": "medium",
+      "evidence": [
+        "app.py"
+      ]
+    },
+    "Flask": {
+      "confidence": "medium",
+      "evidence": [
+        "adapter.py",
+        "app.py",
+        "requirements.txt",
+        "test_api.py"
+      ]
+    }
+  },
+  "languages": [
+    {
+      "extensions": [
+        ".py"
+      ],
+      "file_count": 3,
+      "name": "Python"
+    }
+  ],
+  "manifests": [
+    {
+      "kind": "Python requirements",
+      "path": "requirements.txt"
+    }
+  ],
+  "notes": [
+    "Inventory is evidence collection only; it does not execute project code or access the network.",
+    "Framework, entrypoint, operation and public-surface findings are candidates that require Contract confirmation.",
+    "Secret-like files are excluded by the common secret ignore policy and are never emitted as evidence content.",
+    "Agent inference is lower confidence than route, test, manifest or schema evidence."
+  ],
+  "possible_public_surfaces": [
+    {
+      "confidence": "medium",
+      "evidence": [
+        "adapter.py",
+        "app.py",
+        "test_api.py"
+      ],
+      "id": "http-candidates",
+      "kind": "http",
+      "operations": [
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 82,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "DELETE-/users/<int:user_id>",
+          "kind": "http",
+          "method": "DELETE",
+          "path": "/users/<int:user_id>"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 45,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/health",
+          "kind": "http",
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 92,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/search",
+          "kind": "http",
+          "method": "GET",
+          "path": "/search"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 50,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/users/<int:user_id>",
+          "kind": "http",
+          "method": "GET",
+          "path": "/users/<int:user_id>"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 58,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "POST-/users",
+          "kind": "http",
+          "method": "POST",
+          "path": "/users"
+        }
+      ],
+      "signals": 3
+    },
+    {
+      "confidence": "low",
+      "evidence": [],
+      "id": "schema-candidates",
+      "kind": "http",
+      "operations": [
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 82,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "DELETE-/users/<int:user_id>",
+          "kind": "http",
+          "method": "DELETE",
+          "path": "/users/<int:user_id>"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 45,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/health",
+          "kind": "http",
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 92,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/search",
+          "kind": "http",
+          "method": "GET",
+          "path": "/search"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 50,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "GET-/users/<int:user_id>",
+          "kind": "http",
+          "method": "GET",
+          "path": "/users/<int:user_id>"
+        },
+        {
+          "confidence": "medium",
+          "evidence": [
+            {
+              "line": 58,
+              "path": "app.py",
+              "type": "route-definition"
+            }
+          ],
+          "id": "POST-/users",
+          "kind": "http",
+          "method": "POST",
+          "path": "/users"
+        }
+      ],
+      "signals": 0
+    }
+  ],
+  "read_only": true,
+  "risk_indicators": {
+    "file-io": [
+      "adapter.py"
+    ]
+  },
+  "root": "<benchmark-run>\\source",
+  "schema_version": 2,
+  "schemas": [],
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest"
+    ]
+  ],
+  "tests": [
+    "test_api.py"
+  ]
+}

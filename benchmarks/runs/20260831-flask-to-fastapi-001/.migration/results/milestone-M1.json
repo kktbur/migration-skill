@@ -1,0 +1,135 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [
+    "create-bool-age",
+    "create-duplicate-user",
+    "create-empty-name",
+    "create-invalid-age",
+    "create-invalid-json",
+    "create-missing-name",
+    "create-no-age",
+    "create-null-name",
+    "create-user",
+    "create-whitespace-name",
+    "delete-existing",
+    "delete-invalid-id",
+    "delete-missing",
+    "search-empty",
+    "search-no-match",
+    "search-normal",
+    "search-unicode",
+    "user-found",
+    "user-invalid-id",
+    "user-missing"
+  ],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "target-m1-tests passes",
+      "health parity passes"
+    ],
+    "depends_on": [],
+    "expected_behavior": [
+      "The target starts through the declared adapter.",
+      "GET /health returns the source health response."
+    ],
+    "files": [
+      "app.py",
+      "adapter.py",
+      "test_m1.py"
+    ],
+    "id": "M1",
+    "name": "FastAPI skeleton and health route",
+    "required_cases": [
+      "health"
+    ],
+    "required_checks": [
+      "target-m1-tests"
+    ],
+    "rollback_boundary": "target checkpoint before M1",
+    "scope": [
+      "application startup",
+      "GET /health"
+    ],
+    "verification_command": "run_checks.py --profile target followed by run_parity.py and evaluate_milestone.py"
+  },
+  "milestone_id": "M1",
+  "plan_digest": "sha256:b9012eeb75daed4dd62c38eac75098bd0a164df19d986e4ce8cdba8d6718b227",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "health"
+    ],
+    "checks": [
+      "target-m1-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": []
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": [],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "health"
+    ],
+    "required": [
+      "health"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests"
+    ],
+    "required": [
+      "target-m1-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": "<benchmark-run>\\generated-target",
+    "tree_digest": "sha256:8c7b157578fe097d5580f9cb9c120e378e56b62ebdaae8cb47058516938f8725"
+  }
+}

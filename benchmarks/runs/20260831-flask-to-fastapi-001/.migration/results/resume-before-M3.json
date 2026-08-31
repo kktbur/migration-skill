@@ -1,0 +1,43 @@
+{
+  "actual_freeze_manifest_sha256": "sha256:7f017cd97a67463058bd8a3826e3052aefb9c74713f842c800f3c8d425fd6631",
+  "actual_target_revision": null,
+  "actual_target_tree_digest": "sha256:ba68fbae244f2c83b077c1212eeddd268833605be545d4c47358de7f26182345",
+  "checkpoint": {
+    "accepted_at": "2026-08-31T14:12:07.441025+00:00",
+    "freeze_manifest_sha256": "sha256:7f017cd97a67463058bd8a3826e3052aefb9c74713f842c800f3c8d425fd6631",
+    "id": "checkpoint-M2",
+    "milestone_id": "M2",
+    "protected_cases": [
+      "health",
+      "search-empty",
+      "search-no-match",
+      "search-normal",
+      "search-unicode",
+      "user-found",
+      "user-invalid-id",
+      "user-missing"
+    ],
+    "protected_checks": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "result_digest": "sha256:25fa6a6523e050139288696f2b97137688fef46034e75ab17519ba257f36d977",
+    "result_status": "eligible",
+    "target_revision": null,
+    "target_root": "<benchmark-run>\\generated-target",
+    "target_tree_digest": "sha256:ba68fbae244f2c83b077c1212eeddd268833605be545d4c47358de7f26182345",
+    "verification_score": 1.0
+  },
+  "expected_freeze_manifest_sha256": "sha256:7f017cd97a67463058bd8a3826e3052aefb9c74713f842c800f3c8d425fd6631",
+  "expected_target_revision": null,
+  "expected_target_tree_digest": "sha256:ba68fbae244f2c83b077c1212eeddd268833605be545d4c47358de7f26182345",
+  "freeze_intact": true,
+  "freeze_manifest_matches": true,
+  "last_accepted_milestone": "M2",
+  "schema_version": 1,
+  "status": "ready",
+  "target_revision_matches": true,
+  "target_root": "<benchmark-run>\\generated-target",
+  "target_tree_digest_matches": true,
+  "valid": true
+}

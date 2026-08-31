@@ -1,0 +1,360 @@
+{
+  "cases": [
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "health",
+      "operation_id": "GET-/health",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "user-found",
+      "operation_id": "GET-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "user-missing",
+      "operation_id": "GET-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "user-invalid-id",
+      "operation_id": "GET-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "search-normal",
+      "operation_id": "GET-/search",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "search-empty",
+      "operation_id": "GET-/search",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "search-unicode",
+      "operation_id": "GET-/search",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "search-no-match",
+      "operation_id": "GET-/search",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-user",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-no-age",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-missing-name",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-empty-name",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-whitespace-name",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-invalid-age",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-bool-age",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-null-name",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-invalid-json",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "create-duplicate-user",
+      "operation_id": "POST-/users",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "delete-existing",
+      "operation_id": "DELETE-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "delete-missing",
+      "operation_id": "DELETE-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "delete-invalid-id",
+      "operation_id": "DELETE-/users/:id",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    }
+  ],
+  "freeze_intact": false,
+  "negative_control": false,
+  "negative_control_passed": null,
+  "negative_control_scoped": false,
+  "passed": true,
+  "schema_version": 2,
+  "source_valid": true,
+  "status": "passed",
+  "summary": {
+    "detected_mismatch_cases": [],
+    "expected_mismatch_cases": [],
+    "failed": 0,
+    "mismatch_detected": false,
+    "optional_failed": [],
+    "passed": 21,
+    "required_failed": [],
+    "targeted_control_passed": null,
+    "targeted_mismatch_failures": [],
+    "total": 21
+  }
+}

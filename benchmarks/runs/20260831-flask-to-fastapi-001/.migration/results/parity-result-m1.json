@@ -1,0 +1,381 @@
+{
+  "cases": [
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "health",
+      "operation_id": "GET-/health",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "user-found",
+      "operation_id": "GET-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "user-missing",
+      "operation_id": "GET-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "user-invalid-id",
+      "operation_id": "GET-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "search-normal",
+      "operation_id": "GET-/search",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "search-empty",
+      "operation_id": "GET-/search",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "search-unicode",
+      "operation_id": "GET-/search",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "search-no-match",
+      "operation_id": "GET-/search",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-user",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-no-age",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-missing-name",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-empty-name",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-whitespace-name",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-invalid-age",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-bool-age",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-null-name",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-invalid-json",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "create-duplicate-user",
+      "operation_id": "POST-/users",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "delete-existing",
+      "operation_id": "DELETE-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "delete-missing",
+      "operation_id": "DELETE-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "delete-invalid-id",
+      "operation_id": "DELETE-/users/:id",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "http-api"
+    }
+  ],
+  "freeze_intact": true,
+  "negative_control": false,
+  "negative_control_passed": null,
+  "negative_control_scoped": false,
+  "passed": false,
+  "schema_version": 2,
+  "source_valid": true,
+  "status": "failed",
+  "summary": {
+    "detected_mismatch_cases": [],
+    "expected_mismatch_cases": [],
+    "failed": 20,
+    "mismatch_detected": true,
+    "optional_failed": [],
+    "passed": 1,
+    "required_failed": [
+      "user-found",
+      "user-missing",
+      "user-invalid-id",
+      "search-normal",
+      "search-empty",
+      "search-unicode",
+      "search-no-match",
+      "create-user",
+      "create-no-age",
+      "create-missing-name",
+      "create-empty-name",
+      "create-whitespace-name",
+      "create-invalid-age",
+      "create-bool-age",
+      "create-null-name",
+      "create-invalid-json",
+      "create-duplicate-user",
+      "delete-existing",
+      "delete-missing",
+      "delete-invalid-id"
+    ],
+    "targeted_control_passed": null,
+    "targeted_mismatch_failures": [],
+    "total": 21
+  }
+}

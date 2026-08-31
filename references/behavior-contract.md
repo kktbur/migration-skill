@@ -147,6 +147,12 @@ The same case is sent to Source and Target by `scripts/run_parity.py`. An adapte
 
 It must emit one JSON object on stdout with `status: "passed"` and an `observed` value. The `observed` value is compared by the frozen surface comparator.
 
+The runner serializes the stdin request as ASCII-safe JSON. This keeps the wire
+encoding stable across Windows child-process locales; JSON decoding still
+restores Unicode input values before the adapter invokes the implementation.
+Adapters should likewise emit ASCII-safe JSON when their runtime's stdout
+encoding is locale-dependent.
+
 ## Comparison modes
 
 Schema v2 uses one unambiguous comparator shape:
