@@ -1,0 +1,69 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "node",
+        "test.cjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\source",
+      "duration_seconds": 0.064103,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "execution_failures": [],
+  "inherited_failures": [],
+  "policy": "Existing failures are recorded as inherited; later evaluation checks only for new regressions.",
+  "profile": "source",
+  "results": [
+    {
+      "argv": [
+        "node",
+        "test.cjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\source",
+      "duration_seconds": 0.064103,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "revision": null,
+  "revision_after_checks": null,
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\source",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "source_changed_during_baseline": false,
+  "status": "captured_clean",
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  },
+  "tree_digest": "sha256:dac775cedb28e2fc515d19d70f7fb50036ff8fb938ba8ff0e2857981e094f1e0",
+  "tree_digest_after_checks": "sha256:dac775cedb28e2fc515d19d70f7fb50036ff8fb938ba8ff0e2857981e094f1e0"
+}

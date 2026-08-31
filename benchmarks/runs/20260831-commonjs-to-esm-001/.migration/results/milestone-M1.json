@@ -1,0 +1,126 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [
+    "empty-name-error",
+    "invalid-add-error",
+    "named-add",
+    "named-add-float",
+    "non-string-name-error"
+  ],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "default import behavior matches",
+      "package self-reference resolves through exports"
+    ],
+    "depends_on": [],
+    "expected_behavior": "The ESM package entrypoint exposes the same default greeting for ASCII and Unicode names.",
+    "files": [
+      "package.json",
+      "index.js",
+      "adapter.mjs",
+      "test-m1.mjs"
+    ],
+    "id": "M1",
+    "name": "ESM package entrypoint and default export",
+    "required_cases": [
+      "default-greet",
+      "default-unicode"
+    ],
+    "required_checks": [
+      "target-m1-tests"
+    ],
+    "rollback_boundary": "Revert the M1 target checkpoint; Source remains untouched.",
+    "scope": [
+      "package.json module marker",
+      "package entrypoint",
+      "default export"
+    ],
+    "verification_command": [
+      "node test-m1.mjs",
+      "node --input-type=module -e import('migration-skill-cjs-case')"
+    ]
+  },
+  "milestone_id": "M1",
+  "plan_digest": "sha256:600015a8100deef45239cdc152fe0b2ab923b6b0f2b17d2bc564bd6c8be26e3c",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "default-greet",
+      "default-unicode"
+    ],
+    "checks": [
+      "target-m1-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": []
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [],
+    "required": [],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "default-greet",
+      "default-unicode"
+    ],
+    "required": [
+      "default-greet",
+      "default-unicode"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests"
+    ],
+    "required": [
+      "target-m1-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+    "tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be"
+  }
+}

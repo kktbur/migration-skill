@@ -1,0 +1,45 @@
+{
+  "artifact_type": "judge-validation-v1",
+  "generated_by": "validate_judge.py",
+  "mutation_plan_path": ".migration/mutation-plan.json",
+  "mutation_plan_sha256": "sha256:82f17b7fee003c44b0994ee58c093a332735960c0c8e10b2f37994f704f6979d",
+  "negative_control": true,
+  "negative_controls": [
+    {
+      "detected": true,
+      "expected_case": "default-greet",
+      "expected_operation": "default-export",
+      "mutation_id": "change-default-greeting",
+      "reason": null,
+      "result_path": ".migration/results/negative-default.json",
+      "result_sha256": "sha256:9aea13689b1302c919ce38b2e99837dda652173d5657e693ec73c46374834a4b"
+    },
+    {
+      "detected": true,
+      "expected_case": "empty-name-error",
+      "expected_operation": "error-semantics",
+      "mutation_id": "change-error-message",
+      "reason": null,
+      "result_path": ".migration/results/negative-error.json",
+      "result_sha256": "sha256:143e92b17329adb1fe0c569b8f7f88624b83cf4b6e1fe8cf76686560369678b0"
+    },
+    {
+      "detected": true,
+      "expected_case": "named-add",
+      "expected_operation": "named-export",
+      "mutation_id": "change-named-add",
+      "reason": null,
+      "result_path": ".migration/results/negative-named-add.json",
+      "result_sha256": "sha256:f2fa7f97f84f39b3b0ebd4686f24dd0708da9eed9bf95bd77a64db6e352da8b5"
+    }
+  ],
+  "path_mode": "relative",
+  "positive_control": true,
+  "positive_result_path": ".migration/results/positive-source.json",
+  "positive_result_sha256": "sha256:38b812ccf6e3ee6f45d053c29660285aa723cea1caa31da4764554e7369af310",
+  "schema_version": 1,
+  "source_revision": null,
+  "source_tree_digest": "sha256:dac775cedb28e2fc515d19d70f7fb50036ff8fb938ba8ff0e2857981e094f1e0",
+  "valid": true,
+  "workspace_root": ".."
+}

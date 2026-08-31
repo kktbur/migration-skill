@@ -1,0 +1,77 @@
+{
+  "profile": "target",
+  "results": [
+    {
+      "argv": [
+        "node",
+        "test-m1.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+      "duration_seconds": 0.063422,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-m1-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "m1 ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test-m2.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+      "duration_seconds": 0.062676,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-m2-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "m2 ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+      "duration_seconds": 0.060949,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-m3-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "esm ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 3,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 3
+  }
+}

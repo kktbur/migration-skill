@@ -1,0 +1,7 @@
+{
+  "contract": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\.migration\\migration.json",
+  "corpus": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\.migration\\parity-corpus.json",
+  "errors": [],
+  "schema_version": 1,
+  "status": "valid"
+}

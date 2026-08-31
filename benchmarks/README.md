@@ -24,9 +24,9 @@ Do not publish a `VERIFIED` claim from a benchmark unless the complete artifact 
 | --- | --- | --- |
 | Python CLI → Node CLI | Cross-language command behavior, exit codes, JSON output, and error paths | Blind case implemented; [run 20260831-python-cli-to-node-cli-001](runs/20260831-python-cli-to-node-cli-001/) is `VERIFIED` and includes broken-Target rejection |
 | Flask → FastAPI | Framework migration across HTTP routes and error behavior | Blind case implemented; [run 20260831-flask-to-fastapi-001](runs/20260831-flask-to-fastapi-001/) is `VERIFIED` with 21/21 parity and broken-Target rejection |
-| CommonJS → ESM | Runtime/module-format migration and package entrypoints | Blind case specification implemented; no Target claim |
+| CommonJS → ESM | Runtime/module-format migration and package entrypoints | Blind case implemented; [run 20260831-commonjs-to-esm-001](runs/20260831-commonjs-to-esm-001/) is `VERIFIED` with 7/7 parity and broken-Target rejection |
 
-The first fixture in `tests/test_migration_scripts.py` is intentionally small and dependency-free. It exercises a Python command implementation through the portable adapter protocol and mutation validation; it is evidence for the verifier, not a claim that a Codex-generated Node target has already been verified. The Python CLI → Node CLI and Flask → FastAPI dated runs are public migration evidence; CommonJS → ESM remains specification-only. The three blind cases are in [`cases/python-cli-to-node-cli/`](cases/python-cli-to-node-cli/), [`cases/flask-to-fastapi/`](cases/flask-to-fastapi/), and [`cases/commonjs-to-esm/`](cases/commonjs-to-esm/).
+The first fixture in `tests/test_migration_scripts.py` is intentionally small and dependency-free. It exercises a Python command implementation through the portable adapter protocol and mutation validation; it is evidence for the verifier, not a claim that a Codex-generated Node target has already been verified. The Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM dated runs are public migration evidence. The three blind cases are in [`cases/python-cli-to-node-cli/`](cases/python-cli-to-node-cli/), [`cases/flask-to-fastapi/`](cases/flask-to-fastapi/), and [`cases/commonjs-to-esm/`](cases/commonjs-to-esm/).
 
 ## Adding a benchmark
 

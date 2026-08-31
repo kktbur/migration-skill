@@ -1,0 +1,81 @@
+{
+  "profile": "target",
+  "results": [
+    {
+      "argv": [
+        "node",
+        "test-m1.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-default",
+      "duration_seconds": 0.061082,
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "id": "target-m1-tests",
+      "kind": "test",
+      "required": true,
+      "status": "failed",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'hi Ada'\n- 'hello Ada'\n\n    at file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-default/test-m1.mjs:4:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'hi Ada',\n  expected: 'hello Ada',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test-m2.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-default",
+      "duration_seconds": 0.060666,
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "id": "target-m2-tests",
+      "kind": "test",
+      "required": true,
+      "status": "failed",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'hi Ada'\n- 'hello Ada'\n\n    at file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-default/test-m2.mjs:4:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'hi Ada',\n  expected: 'hello Ada',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-default",
+      "duration_seconds": 0.061904,
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "id": "target-m3-tests",
+      "kind": "test",
+      "required": true,
+      "status": "failed",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'hi Ada'\n- 'hello Ada'\n\n    at file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-default/test.mjs:4:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'hi Ada',\n  expected: 'hello Ada',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-default",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": false,
+    "failed": 3,
+    "passed": 0,
+    "required_failed": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "timed_out": 0,
+    "total": 3
+  }
+}

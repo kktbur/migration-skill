@@ -1,0 +1,247 @@
+{
+  "baseline_capture_clean": true,
+  "baseline_capture_reliable": true,
+  "baseline_identity_matches": true,
+  "freeze_intact": true,
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge": {
+    "errors": [],
+    "negative_control": true,
+    "positive_control": true,
+    "source": "frozen-judge-validation",
+    "valid": true
+  },
+  "migration_score": 1.0,
+  "parity": {
+    "coverage": {
+      "all_required_cases_passed": true,
+      "all_required_cases_present": true,
+      "all_required_operations_covered": true,
+      "all_required_surfaces_covered": true,
+      "covered_operations": [
+        "package-api/default-export",
+        "package-api/error-semantics",
+        "package-api/named-export"
+      ],
+      "covered_surfaces": [
+        "package-api"
+      ],
+      "declared_operations": [
+        "package-api/default-export",
+        "package-api/error-semantics",
+        "package-api/named-export"
+      ],
+      "failed_cases": [],
+      "missing_cases": [],
+      "missing_operations": [],
+      "missing_surfaces": [],
+      "operation_coverage_available": true,
+      "required_cases": [
+        "default-greet",
+        "default-unicode",
+        "empty-name-error",
+        "invalid-add-error",
+        "named-add",
+        "named-add-float",
+        "non-string-name-error"
+      ],
+      "required_operations": [
+        "package-api/default-export",
+        "package-api/error-semantics",
+        "package-api/named-export"
+      ],
+      "required_surfaces": [
+        "package-api"
+      ]
+    },
+    "passed": true,
+    "reported_status": "passed",
+    "summary": {
+      "detected_mismatch_cases": [],
+      "expected_mismatch_cases": [],
+      "failed": 0,
+      "mismatch_detected": false,
+      "optional_failed": [],
+      "passed": 7,
+      "required_failed": [],
+      "targeted_control_passed": null,
+      "targeted_mismatch_failures": [],
+      "total": 7
+    }
+  },
+  "plan": {
+    "all_milestones_completed": true,
+    "completed_milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "errors": [],
+    "milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "provided": true
+  },
+  "proof_set": {
+    "cases": [
+      "default-greet",
+      "default-unicode",
+      "empty-name-error",
+      "invalid-add-error",
+      "named-add",
+      "named-add-float",
+      "non-string-name-error"
+    ],
+    "checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ]
+  },
+  "ratchet_eligible": true,
+  "required_conditions": {
+    "all_milestones_completed": true,
+    "baseline_capture_clean": true,
+    "baseline_capture_reliable": true,
+    "baseline_identity_matches": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "operation_coverage": true,
+    "parity": true,
+    "plan_valid": true,
+    "public_surface_coverage": true,
+    "required_quality_gates": true,
+    "resume_checkpoint": true,
+    "target_required_checks": true
+  },
+  "required_gaps": [],
+  "resume": {
+    "checkpoint_validation": {
+      "checkpoint": {
+        "accepted_at": "2026-08-31T15:48:29.513851+00:00",
+        "freeze_manifest_sha256": "sha256:6ff08390b96d51edf19786ef00cc28df9020c321189f5f79a834c45cac8e5cfa",
+        "id": "checkpoint-M3",
+        "milestone_id": "M3",
+        "protected_cases": [
+          "default-greet",
+          "default-unicode",
+          "empty-name-error",
+          "invalid-add-error",
+          "named-add",
+          "named-add-float",
+          "non-string-name-error"
+        ],
+        "protected_checks": [
+          "target-m1-tests",
+          "target-m2-tests",
+          "target-m3-tests"
+        ],
+        "result_digest": "sha256:1b22e244dcc07c82de5fd1f90531abceb6df1dda74bd43c946629dbcf35fc270",
+        "result_status": "eligible",
+        "target_revision": null,
+        "target_root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+        "target_tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be",
+        "verification_score": 1.0
+      },
+      "preflight_script": "verify_resume.py",
+      "status": "preflight-required",
+      "valid": true
+    },
+    "completed_milestones": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "current_milestone": null,
+    "last_accepted_checkpoint": {
+      "accepted_at": "2026-08-31T15:48:29.513851+00:00",
+      "freeze_manifest_sha256": "sha256:6ff08390b96d51edf19786ef00cc28df9020c321189f5f79a834c45cac8e5cfa",
+      "id": "checkpoint-M3",
+      "milestone_id": "M3",
+      "protected_cases": [
+        "default-greet",
+        "default-unicode",
+        "empty-name-error",
+        "invalid-add-error",
+        "named-add",
+        "named-add-float",
+        "non-string-name-error"
+      ],
+      "protected_checks": [
+        "target-m1-tests",
+        "target-m2-tests",
+        "target-m3-tests"
+      ],
+      "result_digest": "sha256:1b22e244dcc07c82de5fd1f90531abceb6df1dda74bd43c946629dbcf35fc270",
+      "result_status": "eligible",
+      "target_revision": null,
+      "target_root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+      "target_tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be",
+      "verification_score": 1.0
+    }
+  },
+  "schema_version": 2,
+  "score_is_informational_only": true,
+  "source_baseline_regressed": false,
+  "source_regressions": [],
+  "status": "VERIFIED",
+  "target": {
+    "checks_passed": true,
+    "observation": {
+      "expected": [
+        "target-m1-tests",
+        "target-m2-tests",
+        "target-m3-tests"
+      ],
+      "observed": [
+        "target-m1-tests",
+        "target-m2-tests",
+        "target-m3-tests"
+      ],
+      "required_failures": []
+    },
+    "quality_gates": {
+      "build": {
+        "checks": [],
+        "configured": false,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [],
+        "passed": true,
+        "required": false
+      },
+      "static": {
+        "checks": [],
+        "configured": false,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [],
+        "passed": true,
+        "required": false
+      },
+      "test": {
+        "checks": [
+          "target-m1-tests",
+          "target-m2-tests",
+          "target-m3-tests"
+        ],
+        "configured": true,
+        "failed": [],
+        "missing_required_configuration": false,
+        "observed": [
+          "target-m1-tests",
+          "target-m2-tests",
+          "target-m3-tests"
+        ],
+        "passed": true,
+        "required": true
+      }
+    },
+    "required_failures": []
+  }
+}

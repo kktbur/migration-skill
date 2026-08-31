@@ -1,0 +1,55 @@
+{
+  "completed_milestones": [
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "current_milestone": null,
+  "freeze_manifest_sha256": "sha256:6ff08390b96d51edf19786ef00cc28df9020c321189f5f79a834c45cac8e5cfa",
+  "last_accepted_checkpoint": {
+    "accepted_at": "2026-08-31T15:48:29.513851+00:00",
+    "freeze_manifest_sha256": "sha256:6ff08390b96d51edf19786ef00cc28df9020c321189f5f79a834c45cac8e5cfa",
+    "id": "checkpoint-M3",
+    "milestone_id": "M3",
+    "protected_cases": [
+      "default-greet",
+      "default-unicode",
+      "empty-name-error",
+      "invalid-add-error",
+      "named-add",
+      "named-add-float",
+      "non-string-name-error"
+    ],
+    "protected_checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "result_digest": "sha256:1b22e244dcc07c82de5fd1f90531abceb6df1dda74bd43c946629dbcf35fc270",
+    "result_status": "eligible",
+    "target_revision": null,
+    "target_root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+    "target_tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be",
+    "verification_score": 1.0
+  },
+  "last_result_digest": "sha256:1b22e244dcc07c82de5fd1f90531abceb6df1dda74bd43c946629dbcf35fc270",
+  "plan_digest": "sha256:600015a8100deef45239cdc152fe0b2ab923b6b0f2b17d2bc564bd6c8be26e3c",
+  "protected_cases": [
+    "default-greet",
+    "default-unicode",
+    "empty-name-error",
+    "invalid-add-error",
+    "named-add",
+    "named-add-float",
+    "non-string-name-error"
+  ],
+  "protected_checks": [
+    "target-m1-tests",
+    "target-m2-tests",
+    "target-m3-tests"
+  ],
+  "required_gaps": [],
+  "schema_version": 2,
+  "source_revision": null,
+  "verification_score": 1.0
+}

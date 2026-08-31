@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "benchmark": "CommonJS to ESM",
+  "run_id": "20260831-commonjs-to-esm-001",
+  "final_status": "VERIFIED",
+  "source": {
+    "module_format": "CommonJS",
+    "required_parity_cases": 7,
+    "revision": null,
+    "tree_digest": "sha256:dac775cedb28e2fc515d19d70f7fb50036ff8fb938ba8ff0e2857981e094f1e0",
+    "unchanged_after_freeze": true
+  },
+  "target": {
+    "module_format": "ESM",
+    "independent_generated_target": true,
+    "node": "v24.19.0",
+    "tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be"
+  },
+  "contract": {
+    "public_operations": 3,
+    "required_cases": 7,
+    "required_check_kinds": ["test"],
+    "frozen_manifest_schema": 3,
+    "verifier_bundle_frozen": true,
+    "verifier_bundle_files": 15
+  },
+  "judge": {
+    "positive_control": true,
+    "negative_controls": 3,
+    "negative_controls_detected": 3,
+    "valid": true
+  },
+  "milestones": {
+    "accepted": 3,
+    "total": 3,
+    "ids": ["M1", "M2", "M3"],
+    "verification_score": 1.0
+  },
+  "verification": {
+    "target_checks_passed": true,
+    "target_check_results": "3/3",
+    "parity_passed": 7,
+    "parity_total": 7,
+    "required_parity_failed": [],
+    "source_new_regressions": [],
+    "status": "VERIFIED"
+  },
+  "broken_target_rejection": [
+    {
+      "mutation": "change default greeting from hello to hi",
+      "expected_case": "default-greet",
+      "status": "negative_control_passed"
+    },
+    {
+      "mutation": "change empty-name error message",
+      "expected_case": "empty-name-error",
+      "status": "negative_control_passed"
+    },
+    {
+      "mutation": "change named add result",
+      "expected_case": "named-add",
+      "status": "negative_control_passed"
+    }
+  ],
+  "resume": {
+    "final_checkpoint": "ready",
+    "tampered_target": "invalidated"
+  },
+  "execution": {
+    "network_required": false,
+    "credentials_provided": false,
+    "repair_rounds": "not_instrumented",
+    "manual_interventions": "not_instrumented",
+    "elapsed_seconds": "not_instrumented",
+    "token_usage": "unavailable"
+  },
+  "migration_notes": [
+    "Replaced module.exports with ESM default and named exports.",
+    "Added package.json type=module and package exports self-reference.",
+    "Preserved TypeError names, messages, finite-number validation, and Unicode behavior.",
+    "Used native Node.js ESM imports in the adapter and tests."
+  ]
+}

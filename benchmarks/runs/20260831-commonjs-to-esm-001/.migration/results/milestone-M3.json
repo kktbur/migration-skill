@@ -1,0 +1,153 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "all package behavior cases match",
+      "target has no CommonJS require/module.exports dependency"
+    ],
+    "depends_on": [
+      "M2"
+    ],
+    "expected_behavior": "Invalid greeting and add inputs expose the same TypeError names and stable messages.",
+    "files": [
+      "adapter.mjs",
+      "test.mjs",
+      "package.json"
+    ],
+    "id": "M3",
+    "name": "Error semantics and cleanup",
+    "required_cases": [
+      "empty-name-error",
+      "non-string-name-error",
+      "invalid-add-error"
+    ],
+    "required_checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "rollback_boundary": "Revert to the accepted M2 target checkpoint.",
+    "scope": [
+      "error type",
+      "error message",
+      "module cleanup"
+    ],
+    "verification_command": [
+      "node test.mjs",
+      "node --check index.js"
+    ]
+  },
+  "milestone_id": "M3",
+  "plan_digest": "sha256:600015a8100deef45239cdc152fe0b2ab923b6b0f2b17d2bc564bd6c8be26e3c",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "default-greet",
+      "default-unicode",
+      "empty-name-error",
+      "invalid-add-error",
+      "named-add",
+      "named-add-float",
+      "non-string-name-error"
+    ],
+    "checks": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "default-greet",
+      "default-unicode",
+      "named-add",
+      "named-add-float"
+    ],
+    "required": [
+      "default-greet",
+      "default-unicode",
+      "named-add",
+      "named-add-float"
+    ]
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "required": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "empty-name-error",
+      "invalid-add-error",
+      "non-string-name-error"
+    ],
+    "required": [
+      "empty-name-error",
+      "invalid-add-error",
+      "non-string-name-error"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "required": [
+      "target-m1-tests",
+      "target-m2-tests",
+      "target-m3-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+    "tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be"
+  }
+}

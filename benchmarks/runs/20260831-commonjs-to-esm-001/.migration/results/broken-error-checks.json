@@ -1,0 +1,79 @@
+{
+  "profile": "target",
+  "results": [
+    {
+      "argv": [
+        "node",
+        "test-m1.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-error",
+      "duration_seconds": 0.061981,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-m1-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "m1 ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test-m2.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-error",
+      "duration_seconds": 0.061576,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-m2-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "m2 ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    },
+    {
+      "argv": [
+        "node",
+        "test.mjs"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-error",
+      "duration_seconds": 0.063601,
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "id": "target-m3-tests",
+      "kind": "test",
+      "required": true,
+      "status": "failed",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  Comparison {\n+   message: 'name missing',\n-   message: 'name required',\n    name: 'TypeError'\n  }\n\n    at file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-error/test.mjs:8:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: TypeError: name missing\n      at greet (file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-error/index.js:3:11)\n      at assert.throws.name (file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-error/test.mjs:8:21)\n      at getActual (node:assert:611:5)\n      at strict.throws (node:assert:759:24)\n      at file:///E:/codex%20project/18_20260830_Migration%20Skill/migration-skill/benchmarks/runs/20260831-commonjs-to-esm-001/broken-error/test.mjs:8:8\n      at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n      at async node:internal/modules/esm/loader:643:26\n      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5),\n  expected: { name: 'TypeError', message: 'name required' },\n  operator: 'throws',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\broken-error",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": false,
+    "failed": 1,
+    "passed": 2,
+    "required_failed": [
+      "target-m3-tests"
+    ],
+    "timed_out": 0,
+    "total": 3
+  }
+}

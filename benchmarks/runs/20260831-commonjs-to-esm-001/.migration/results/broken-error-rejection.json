@@ -1,0 +1,143 @@
+{
+  "cases": [
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "default-greet",
+      "operation_id": "default-export",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "default-unicode",
+      "operation_id": "default-export",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "named-add",
+      "operation_id": "named-export",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "named-add-float",
+      "operation_id": "named-export",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "empty-name-error",
+      "operation_id": "error-semantics",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "non-string-name-error",
+      "operation_id": "error-semantics",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "package-api"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "invalid-add-error",
+      "operation_id": "error-semantics",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "package-api"
+    }
+  ],
+  "freeze_intact": true,
+  "negative_control": true,
+  "negative_control_passed": true,
+  "negative_control_scoped": true,
+  "passed": true,
+  "schema_version": 2,
+  "source_valid": true,
+  "status": "negative_control_passed",
+  "summary": {
+    "detected_mismatch_cases": [
+      "empty-name-error"
+    ],
+    "expected_mismatch_cases": [
+      "empty-name-error"
+    ],
+    "failed": 2,
+    "mismatch_detected": true,
+    "optional_failed": [],
+    "passed": 5,
+    "required_failed": [
+      "empty-name-error",
+      "non-string-name-error"
+    ],
+    "targeted_control_passed": true,
+    "targeted_mismatch_failures": [],
+    "total": 7
+  }
+}

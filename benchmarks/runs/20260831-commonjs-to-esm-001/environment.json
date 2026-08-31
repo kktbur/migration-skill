@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-08-31",
+  "platform": "Windows",
+  "runtime": {
+    "node": "v24.19.0",
+    "npm": "11.17.0"
+  },
+  "dependencies": "none",
+  "network": "not required",
+  "credentials": "not provided",
+  "instrumentation": {
+    "repair_rounds": "not instrumented",
+    "manual_interventions": "not instrumented",
+    "elapsed_seconds": "not instrumented",
+    "token_usage": "unavailable"
+  }
+}

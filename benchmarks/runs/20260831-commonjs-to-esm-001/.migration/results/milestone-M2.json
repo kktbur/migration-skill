@@ -1,0 +1,139 @@
+{
+  "artifact_type": "milestone-result-v1",
+  "eligible": true,
+  "freeze_intact": true,
+  "future_cases_not_required": [
+    "empty-name-error",
+    "invalid-add-error",
+    "non-string-name-error"
+  ],
+  "gate_failures": [],
+  "inherited_failures": [],
+  "judge_valid": true,
+  "migration_score": 1.0,
+  "milestone": {
+    "acceptance": [
+      "default export proof remains passing",
+      "named export matches for integer and float inputs"
+    ],
+    "depends_on": [
+      "M1"
+    ],
+    "expected_behavior": "The named add export preserves finite-number validation and numeric results.",
+    "files": [
+      "index.js",
+      "adapter.mjs",
+      "test-m2.mjs"
+    ],
+    "id": "M2",
+    "name": "Named export",
+    "required_cases": [
+      "named-add",
+      "named-add-float"
+    ],
+    "required_checks": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "rollback_boundary": "Revert to the accepted M1 target checkpoint.",
+    "scope": [
+      "named add export",
+      "numeric input semantics"
+    ],
+    "verification_command": [
+      "node test-m2.mjs"
+    ]
+  },
+  "milestone_id": "M2",
+  "plan_digest": "sha256:600015a8100deef45239cdc152fe0b2ab923b6b0f2b17d2bc564bd6c8be26e3c",
+  "plan_errors": [],
+  "proof_set": {
+    "cases": [
+      "default-greet",
+      "default-unicode",
+      "named-add",
+      "named-add-float"
+    ],
+    "checks": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ]
+  },
+  "protected_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "default-greet",
+      "default-unicode"
+    ],
+    "required": [
+      "default-greet",
+      "default-unicode"
+    ]
+  },
+  "protected_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests"
+    ],
+    "required": [
+      "target-m1-tests"
+    ],
+    "unknown": []
+  },
+  "ratchet_eligible": true,
+  "required_cases": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "named-add",
+      "named-add-float"
+    ],
+    "required": [
+      "named-add",
+      "named-add-float"
+    ]
+  },
+  "required_checks": {
+    "all_passed": true,
+    "failed": [],
+    "missing": [],
+    "passed": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "required": [
+      "target-m1-tests",
+      "target-m2-tests"
+    ],
+    "unknown": []
+  },
+  "required_conditions": {
+    "baseline_identity_matches": true,
+    "baseline_reliable": true,
+    "dependencies_met": true,
+    "freeze_intact": true,
+    "judge_valid": true,
+    "milestone_required_cases": true,
+    "milestone_required_checks": true,
+    "no_new_source_regression": true,
+    "no_required_gaps": true,
+    "plan_valid": true,
+    "protected_cases": true,
+    "protected_checks": true,
+    "state_schema_valid": true
+  },
+  "schema_version": 1,
+  "score_is_informational_only": true,
+  "source_regressions": [],
+  "status": "eligible",
+  "target": {
+    "revision": null,
+    "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\runs\\20260831-commonjs-to-esm-001\\generated-target",
+    "tree_digest": "sha256:b3646a8605ef0c418f3e4051f36ac978f418cbad9f2dec607db19c831a4773be"
+  }
+}
