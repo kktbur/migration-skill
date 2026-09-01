@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Iterable
 
 
@@ -70,8 +70,15 @@ def _relative_path(value: Any, label: str, errors: list[str]) -> None:
     if not isinstance(value, str) or not value:
         errors.append(f"{label} must be a non-empty relative path")
         return
-    path = Path(value)
-    if path.is_absolute() or ".." in path.parts:
+    posix_path = PurePosixPath(value)
+    windows_path = PureWindowsPath(value)
+    if (
+        posix_path.is_absolute()
+        or windows_path.is_absolute()
+        or bool(windows_path.drive)
+        or ".." in posix_path.parts
+        or ".." in windows_path.parts
+    ):
         errors.append(f"{label} must stay relative to the benchmark run")
 
 
@@ -131,7 +138,13 @@ def validate_matrix(document: Any) -> list[str]:
             errors.append(f"{label} must be an object")
             continue
         run_id = entry.get("run_id")
-        if not isinstance(run_id, str) or not run_id or Path(run_id).name != run_id:
+        if (
+            not isinstance(run_id, str)
+            or not run_id
+            or PurePosixPath(run_id).name != run_id
+            or PureWindowsPath(run_id).name != run_id
+            or PureWindowsPath(run_id).drive
+        ):
             errors.append(f"{label}.run_id must be a simple directory name")
         elif run_id in run_ids:
             errors.append(f"duplicate run_id: {run_id}")
