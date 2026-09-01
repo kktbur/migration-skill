@@ -8,18 +8,23 @@ Codex CLI observed: `0.147.0`
 ## Executive status
 
 `BLOCKED` for complete host-level lifecycle proof. The deterministic package,
-freeze-boundary, rollback, and evidence-isolation model tests are `PASS`, but
-the real Codex host has not yet completed fresh install, discovery, explicit
-invocation, natural-language invocation, or Plugin dogfood migration.
+freeze-boundary, rollback, and evidence-isolation model tests are `PASS`. A
+real `codex-cli 0.147.0` process also completed marketplace add, Plugin
+discovery, installation, upgrade mismatch detection, rollback, and
+uninstall/reinstall in a workspace-isolated `CODEX_HOME`. The model-backed
+new-session invocation and Agent-generated Plugin dogfood remain blocked by
+the host's TLS transport.
 
 Issue #14 remains open. This report must not be read as a release or closeout
 claim.
 
-The host probe reported that the current environment cannot resolve a Codex
-home directory. The environment had `USERPROFILE` present but no usable
-`HOME`/`CODEX_HOME` for the CLI's configuration lookup. No task-specific
-`HOME` or `CODEX_HOME` value was supplied, and no host configuration or Plugin
-cache was changed.
+The default host probe still reports that the ambient environment has no
+usable `HOME`/`CODEX_HOME` for the CLI's configuration lookup. The follow-up
+used a workspace-local, disposable `CODEX_HOME` only for the child CLI
+process. System `%TEMP%` is rejected by this CLI because it refuses to create
+helper binaries there, so the isolated directory was placed under the project
+workspace and deleted after the test. No real user Codex home or global
+environment variable was changed.
 
 ## Results
 
@@ -27,12 +32,14 @@ cache was changed.
 | --- | --- | --- |
 | Local marketplace staging | `PASS` | `tests/plugin_lifecycle/marketplace/.agents/plugins/marketplace.json` and temporary staging test |
 | Filesystem-model fresh install | `PASS` | Versioned temporary install; no user `.migration/` is created |
-| Host fresh install | `BLOCKED` | Codex home-directory resolution failed; host execution is opt-in |
-| Plugin discovery in a new session | `MANUAL_REQUIRED` | The probe cannot create or inspect a new Codex session |
-| `$migration-skill` invocation | `MANUAL_REQUIRED` | Requires a new host session |
-| Natural-language invocation | `MANUAL_REQUIRED` | Requires a new host session |
+| Host fresh install in isolated `CODEX_HOME` | `PASS` | `codex plugin marketplace add` and `codex plugin add` completed |
+| Plugin discovery through host CLI | `PASS` | `codex plugin list --available` and installed listing showed `migration-skill@migration-skill-dev` |
+| Plugin discovery in a new model session | `BLOCKED` | `codex exec` could not complete model transport |
+| `$migration-skill` invocation | `BLOCKED` | Session startup reached the API transport, which failed with TLS `UnknownIssuer` |
+| Natural-language invocation | `BLOCKED` | Same model transport blocker; no trigger claim is made |
 | Raw Skill package identity | `PASS` | Staged Plugin contains the same canonical `skills/migration-skill/` package |
-| Installed Plugin dogfood migration | `NOT_RUN` | Do not relabel the historical raw Skill benchmark as Plugin dogfood |
+| Installed Plugin verifier dogfood replay | `PASS` | `benchmarks/plugin-runs/20260901-plugin-python-node-001/` reports `VERIFIED`, 8/8 parity, and broken-target rejection |
+| Agent-generated Plugin dogfood migration | `BLOCKED` | No model-backed new-session invocation was completed |
 | Upgrade verifier mismatch | `PASS` | Active bundle hash change returns `verifier-bundle-mismatch` |
 | Rollback recovery | `PASS` | Compatible bundle resumes and user evidence snapshots are unchanged |
 | Uninstall preserves data | `PASS` | Temporary Plugin removal leaves Source, Target, and `.migration/` intact |
@@ -58,6 +65,12 @@ Skill evidence. Its `report.json` says `VERIFIED` and its broken-target
 negative evidence says `failed`; it was not presented as an installed Plugin
 run.
 
+The isolated host dogfood evidence at
+`benchmarks/plugin-runs/20260901-plugin-python-node-001/` is deliberately
+narrower: it proves that the installed Plugin's verifier bundle can replay the
+published Source/Target evidence and preserve the lifecycle boundary. It does
+not claim that the unavailable model session generated the Target.
+
 The current local suite contains 46 tests and passes on the bundled Python
 runtime. The suite does not invoke `--execute-host`.
 
@@ -80,7 +93,7 @@ automate the new-session Skill-discovery or trigger checks.
 ## Acceptance rule
 
 Do not close Issue #14 or publish the final `v0.2.0` release until a real host
-has produced auditable evidence for fresh install, discovery, explicit and
-natural-language invocation, Plugin dogfood migration, upgrade mismatch,
-rollback, uninstall, and reinstall. A host-level `BLOCKED` result is not a
-successful lifecycle result.
+has produced auditable evidence for a new-session Skill discovery, explicit
+and natural-language invocation, and Agent-generated Plugin dogfood
+migration, in addition to the lifecycle checks already recorded here. A
+host-level `BLOCKED` result is not a successful lifecycle result.

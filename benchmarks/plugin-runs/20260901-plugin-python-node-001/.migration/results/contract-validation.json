@@ -1,0 +1,7 @@
+{
+  "contract": "<PLUGIN_RUN_ROOT>\\.migration\\migration.json",
+  "corpus": "<PLUGIN_RUN_ROOT>\\.migration\\parity-corpus.json",
+  "errors": [],
+  "schema_version": 1,
+  "status": "valid"
+}

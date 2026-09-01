@@ -1,0 +1,215 @@
+{
+  "adapter_protocol": "stdin-case-json-v1",
+  "cases": [
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.07697,
+      "id": "normal-json",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello Ada"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello Ada\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.072848,
+      "id": "normal-text",
+      "observed": {
+        "exit_code": 0,
+        "stdout": "hello Ada\n"
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": \"hello Ada\\n\"}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.07354,
+      "id": "uppercase",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello ADA"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello ADA\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.071557,
+      "id": "unicode",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "greeting": "hello ����"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"greeting\": \"hello ����\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.07215,
+      "id": "empty-name",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "name required"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"name required\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.072437,
+      "id": "invalid-option",
+      "observed": {
+        "exit_code": 0,
+        "stdout": {
+          "error": "invalid arguments"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 0, \"stdout\": {\"error\": \"invalid arguments\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.071839,
+      "id": "missing-argument",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "name required"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"name required\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    },
+    {
+      "adapter_exit_code": 0,
+      "argv": [
+        "python",
+        "adapter.py"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+      "duration_seconds": 0.073204,
+      "id": "invalid-format",
+      "observed": {
+        "exit_code": 2,
+        "stdout": {
+          "error": "format must be json or text"
+        }
+      },
+      "operation_id": "invoke",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "{\"observed\": {\"exit_code\": 2, \"stdout\": {\"error\": \"format must be json or text\"}}, \"status\": \"passed\"}\n",
+      "stdout_truncated": false,
+      "surface_id": "main-cli",
+      "timeout": false
+    }
+  ],
+  "profile": "source",
+  "root": "<PLUGIN_RUN_ROOT>\\mutation-invalid",
+  "schema_version": 2,
+  "status": "passed",
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 8,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 8
+  }
+}

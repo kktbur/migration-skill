@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "marketplace": {
+    "name": "migration-skill-dev",
+    "source": "local workspace marketplace",
+    "added": true,
+    "discovery": true
+  },
+  "plugin": {
+    "id": "migration-skill@migration-skill-dev",
+    "name": "migration-skill",
+    "version": "0.2.0",
+    "installed": true,
+    "enabled": true
+  },
+  "host": {
+    "codex_cli": "codex-cli 0.147.0",
+    "codex_home": "workspace-isolated temporary directory",
+    "global_codex_home_modified": false,
+    "global_environment_modified": false
+  },
+  "checks": {
+    "marketplace_add": "PASS",
+    "available_plugin_discovery": "PASS",
+    "plugin_install": "PASS",
+    "installed_plugin_list": "PASS",
+    "new_session_skill_discovery": "BLOCKED",
+    "explicit_skill_invocation": "BLOCKED",
+    "natural_language_invocation": "BLOCKED"
+  },
+  "blocker": "codex exec reached session startup but the API transport failed with invalid peer certificate: UnknownIssuer; no model-backed invocation claim is made"
+}

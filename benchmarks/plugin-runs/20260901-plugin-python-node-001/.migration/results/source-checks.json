@@ -1,0 +1,44 @@
+{
+  "profile": "source",
+  "results": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-q"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\source",
+      "duration_seconds": 0.298722,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 2 tests in 0.204s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "<PLUGIN_RUN_ROOT>\\source",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  }
+}

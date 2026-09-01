@@ -1,0 +1,53 @@
+{
+  "completed_milestones": [
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "current_milestone": null,
+  "freeze_manifest_sha256": "sha256:009cccd19a9f22ed4ddb95315d6b14e05752b615b33f70af3c6ad292472d6ce6",
+  "last_accepted_checkpoint": {
+    "accepted_at": "2026-09-01T06:21:18.416206+00:00",
+    "freeze_manifest_sha256": "sha256:009cccd19a9f22ed4ddb95315d6b14e05752b615b33f70af3c6ad292472d6ce6",
+    "id": "checkpoint-M3",
+    "milestone_id": "M3",
+    "protected_cases": [
+      "empty-name",
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text",
+      "unicode",
+      "uppercase"
+    ],
+    "protected_checks": [
+      "target-tests"
+    ],
+    "result_digest": "sha256:a3a906f93f38d9efafa44bdb87cc96781f92db6dc43cadf4497030db40955e16",
+    "result_status": "VERIFIED",
+    "target_revision": null,
+    "target_root": "<PLUGIN_RUN_ROOT>\\generated-target",
+    "target_tree_digest": "sha256:5f1ac91d1c183104ce99d2a2a10a73b34e65465bf4400c1cb99ae938613a376e",
+    "verification_score": 1.0
+  },
+  "last_result_digest": "sha256:a3a906f93f38d9efafa44bdb87cc96781f92db6dc43cadf4497030db40955e16",
+  "protected_cases": [
+    "empty-name",
+    "invalid-format",
+    "invalid-option",
+    "missing-argument",
+    "normal-json",
+    "normal-text",
+    "unicode",
+    "uppercase"
+  ],
+  "protected_checks": [
+    "target-tests"
+  ],
+  "required_gaps": [],
+  "schema_version": 2,
+  "source_revision": null,
+  "status": "in_progress",
+  "verification_score": 1.0
+}

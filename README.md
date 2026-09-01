@@ -76,6 +76,11 @@ The host-level lifecycle probe and its current evidence are documented in
 [`docs/plugin-lifecycle-test-report.md`](docs/plugin-lifecycle-test-report.md).
 The probe is manual-only by default; use `--execute-host` only when changing
 the local Codex marketplace and Plugin cache is explicitly authorized.
+The isolated host replay evidence is published at
+[`benchmarks/plugin-runs/20260901-plugin-python-node-001/`](benchmarks/plugin-runs/20260901-plugin-python-node-001/).
+It records successful marketplace/install/discovery and verifier-bundle
+upgrade/rollback/uninstall checks, while keeping model-backed new-session
+invocation explicitly blocked when the host transport is unavailable.
 
 ## Adapter protocol
 

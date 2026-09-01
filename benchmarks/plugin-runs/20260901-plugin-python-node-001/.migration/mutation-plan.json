@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "negative_controls": [
+    {
+      "mutation_id": "change-normal-greeting",
+      "expected_case": "normal-json",
+      "expected_operation": "invoke",
+      "mutation": "Change the target greeting value while preserving process startup.",
+      "result": "results/negative-normal-json.json"
+    },
+    {
+      "mutation_id": "change-error-exit-code",
+      "expected_case": "invalid-option",
+      "expected_operation": "invoke",
+      "mutation": "Change the target invalid-option exit code from 2 to 0.",
+      "result": "results/negative-invalid-option.json"
+    }
+  ]
+}

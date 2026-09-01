@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "os": "Windows",
+  "platform": "win32",
+  "python": "Codex primary bundled runtime",
+  "python_version": "3.12.13",
+  "node": "node",
+  "node_version": "v24.19.0",
+  "codex_cli": "codex-cli 0.147.0",
+  "codex_home": "workspace-isolated temporary directory",
+  "network_required_for_fixture": false,
+  "new_session_transport": "blocked: invalid peer certificate: UnknownIssuer",
+  "sandbox": "local fixture; no production or credential access",
+  "global_codex_home_modified": false
+}

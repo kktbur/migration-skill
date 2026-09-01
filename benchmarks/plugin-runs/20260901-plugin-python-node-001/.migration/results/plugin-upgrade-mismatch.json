@@ -1,0 +1,9 @@
+{
+  "active_verifier_root": "<ISOLATED_HOST_ROOT>\\codex-home\\plugins\\cache\\migration-skill-dev\\migration-skill\\0.2.1-test\\skills\\migration-skill\\scripts",
+  "error": "active verifier bundle 与冻结 bundle 不一致: changed=compare_results.py",
+  "freeze_intact": true,
+  "reason": "verifier-bundle-mismatch",
+  "schema_version": 1,
+  "status": "invalidated",
+  "valid": false
+}

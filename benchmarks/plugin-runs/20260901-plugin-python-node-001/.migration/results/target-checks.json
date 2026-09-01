@@ -1,0 +1,39 @@
+{
+  "profile": "target",
+  "results": [
+    {
+      "argv": [
+        "node",
+        "test.js"
+      ],
+      "cwd": "<PLUGIN_RUN_ROOT>\\generated-target",
+      "duration_seconds": 0.507546,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "target-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "",
+      "stderr_truncated": false,
+      "stdout": "ok\n",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "<PLUGIN_RUN_ROOT>\\generated-target",
+  "runner": {
+    "platform": "win32",
+    "python": "python",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  }
+}
