@@ -10,7 +10,20 @@
     "codex_cli_version": "0.147.0",
     "network_mode": "TUN (reported test condition)",
     "model_transport_smoke": "PASS",
-    "tls_unknown_issuer": "not_reproduced"
+    "tls_unknown_issuer": "reproduced_in_workspace_write_probe",
+    "transport_checks": [
+      {
+        "id": "read-only-smoke",
+        "status": "PASS",
+        "tls_unknown_issuer": "not_reproduced"
+      },
+      {
+        "id": "workspace-write-follow-up",
+        "status": "BLOCKED",
+        "tls_unknown_issuer": "reproduced",
+        "reason": "wss://api.openai.com/v1/responses returned UnknownIssuer; HTTPS fallback also failed"
+      }
+    ]
   },
   "runtime": {
     "python": "3.12.13",
@@ -33,6 +46,12 @@
     "target_generation": "current Codex implementation session",
     "installed_plugin_agent_write_step": "BLOCKED",
     "blocker": "nested Windows workspace-write sandbox returned helper_unknown_error: setup refresh had errors before command execution",
+    "latest_workspace_write_probe": {
+      "status": "BLOCKED",
+      "filesystem_write_reached": false,
+      "reason": "model transport returned UnknownIssuer over WebSocket and HTTPS fallback",
+      "tls_verification_disabled": false
+    },
     "protocol_replay": "VERIFIED",
     "required_parity": "8/8",
     "broken_target_rejection": "PASS"

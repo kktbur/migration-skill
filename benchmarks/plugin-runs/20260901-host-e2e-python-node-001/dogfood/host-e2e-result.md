@@ -4,7 +4,8 @@ Test object: Migration Skill `v0.2.0-rc.1`, Contract schema 2, Freeze schema 3, 
 
 ## Completed
 
-- Model transport smoke: PASS; `UnknownIssuer` did not reproduce on the tested TUN path.
+- Model transport smoke: PASS on the earlier read-only TUN-path check; `UnknownIssuer` was not reproduced in that check.
+- Follow-up workspace-write transport probe: `BLOCKED`. With a disposable workspace-local `CODEX_HOME`, the model connection failed with `UnknownIssuer` over WebSocket and then HTTPS fallback before the requested filesystem write was reached. TLS verification remained enabled.
 - Local marketplace installation and enabled Plugin discovery: PASS.
 - Fresh-session bundled Skill loading: PASS.
 - Explicit `$migration-skill` invocation: PASS.
@@ -17,7 +18,7 @@ Test object: Migration Skill `v0.2.0-rc.1`, Contract schema 2, Freeze schema 3, 
 
 ## Remaining gate
 
-The installed Plugin Agent could not complete the write-enabled dogfood step. The nested Codex `workspace-write` sandbox returned `helper_unknown_error: setup refresh had errors` before even harmless commands could run. A controlled `danger-full-access` workaround was rejected because it would remove the enforceable filesystem boundary.
+The installed Plugin Agent could not complete the write-enabled dogfood step. The first nested Codex `workspace-write` attempt returned `helper_unknown_error: setup refresh had errors` before even harmless commands could run. A follow-up with a disposable workspace-local `CODEX_HOME` reached model startup but failed on `UnknownIssuer` before the write command. A controlled `danger-full-access` workaround was rejected because it would remove the enforceable filesystem boundary.
 
 The target in this evidence was therefore produced by the current Codex implementation session in the isolated run directory, not by a successful nested installed-Plugin write session. This is useful protocol evidence but does not satisfy the final Host E2E gate.
 
@@ -25,4 +26,4 @@ The target in this evidence was therefore produced by the current Codex implemen
 
 `host_e2e_status: BLOCKED` and `release_gate: NOT_CLEARED`.
 
-Do not close Issue #16 or promote `v0.2.0` based on this run. Re-run the remaining Agent-write step on a Host where nested `workspace-write` command execution is available, or perform it manually in a fresh Codex Desktop/CLI session with the same RC and clean network path.
+Do not close Issue #16 or promote `v0.2.0` based on this run. Re-run the remaining Agent-write step on a Host where both model transport and nested `workspace-write` command execution are available, or perform it manually in a fresh Codex Desktop/CLI session with the same RC and clean network path. Do not disable TLS verification.

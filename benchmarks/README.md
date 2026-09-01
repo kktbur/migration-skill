@@ -51,6 +51,14 @@ then replays all three matrix entries. The job fails if any run is `FAILED`,
 `INVALID`, `BLOCKED`, or not `VERIFIED`; the normal unit-test job does not
 install these benchmark-only dependencies.
 
+The latest published CI evidence is [workflow run #19](https://github.com/kktbur/migration-skill/actions/runs/33524395511)
+on commit [`4f82803`](https://github.com/kktbur/migration-skill/commit/4f82803bd8469c59edc8d5547076ee6cf570d294):
+the benchmark-only dependency installation, all three benchmark replays, and
+the `3/3 VERIFIED` gate completed successfully. The checked-in
+`regression-report.json` remains a host-local snapshot and may legitimately be
+`blocked` when those benchmark-only dependencies are absent; it is not a
+replacement for the CI gate.
+
 The published Python CLI Source test is locale-sensitive on Windows because
 the historical fixture did not pin subprocess text encoding. The Windows CI
 job therefore does not run that replay smoke; it still runs the full protocol

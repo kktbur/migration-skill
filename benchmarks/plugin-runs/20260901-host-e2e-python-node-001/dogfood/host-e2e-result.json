@@ -14,6 +14,14 @@
     "explicit_invocation": "PASS",
     "implicit_invocation": "PASS"
   },
+  "latest_workspace_write_probe": {
+    "purpose": "Recheck model-backed workspace-write transport before repeating Plugin dogfood",
+    "status": "BLOCKED",
+    "codex_home": "workspace-local disposable home",
+    "filesystem_write_reached": false,
+    "reason": "wss://api.openai.com/v1/responses returned invalid peer certificate: UnknownIssuer; HTTPS fallback also failed",
+    "tls_verification_disabled": false
+  },
   "protocol_replay": {
     "status": "VERIFIED",
     "target_started_empty": true,
