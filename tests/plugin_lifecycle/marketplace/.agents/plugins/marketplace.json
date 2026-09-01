@@ -1,0 +1,20 @@
+{
+  "name": "migration-skill-dev",
+  "interface": {
+    "displayName": "Migration Skill Development"
+  },
+  "plugins": [
+    {
+      "name": "migration-skill",
+      "source": {
+        "source": "local",
+        "path": "./plugins/migration-skill"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer tools"
+    }
+  ]
+}

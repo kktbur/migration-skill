@@ -28,7 +28,7 @@ Read [references/migration-workflow.md](references/migration-workflow.md) for th
 4. **Judge**: reuse portable existing tests when possible. Otherwise build adapters around HTTP, CLI, library, file, or snapshot surfaces. Execute the same Corpus through `scripts/run_parity.py` for `source` and `target`, then compare the artifacts with `scripts/compare_results.py`. The Judge must pass on the source and fail on a targeted mutation of a required case; record this with `scripts/validate_judge.py`.
 5. **Freeze**: validate and freeze the source revision/tree digest, Contract, Corpus, Judge artifact, check specification, normalization policy, and the complete Python verifier bundle with `scripts/freeze_contract.py`. v1.2 emits a relocatable v3 manifest when all assets are inside `--workspace-root`. A hand-written pair of boolean flags is not a valid Judge artifact.
 6. **Plan**: write `.migration/migration-plan.json` and validate its milestone IDs, dependencies, required cases, and required target checks with `scripts/validate_plan.py`. Do not assume one universal file or layer order; use module seams and public boundaries discovered in the inventory.
-7. **Resume preflight**: before editing the target for a new milestone, run `scripts/verify_resume.py`. It compares the current Target with the last accepted checkpoint and stops on external edits. Do not repeat this comparison after edits as a final gate.
+7. **Resume preflight**: before editing the target for a new milestone, run `scripts/verify_resume.py`. It compares the current Target with the last accepted checkpoint and stops on external edits. When the Skill is loaded from a Plugin, also pass the installed bundle's `scripts/` directory with `--verifier-root`; a Plugin upgrade with different verifier hashes must invalidate resume. Do not repeat this comparison after edits as a final gate.
 8. **Rewrite**: execute one milestone at a time in the isolated target. Codex performs cross-file reasoning, edits, dependency installation, builds, tests, and repairs directly.
 9. **Milestone gate**: run `scripts/evaluate_milestone.py`. It checks only the current milestone, all previously protected cases/checks, freeze/Judge integrity, baseline regression, and declared dependencies. Future milestone cases may be missing at this point.
 10. **Ratchet**: call `scripts/advance_milestone.py` with the milestone result. It atomically updates `state.json` only when the new proof set contains every previously protected case and check. Scores are informational and do not define acceptance.
@@ -87,7 +87,7 @@ freeze_contract.py --root PATH --contract PATH --corpus PATH --evaluator PATH --
 run_checks.py --root PATH --spec PATH --output PATH [--profile source|target] [--var KEY=VALUE]
 validate_plan.py --plan PATH [--contract PATH --corpus PATH] [--output PATH]
 evaluate_milestone.py --baseline PATH --source PATH --target PATH --parity PATH --contract PATH --plan PATH --state PATH --manifest PATH --milestone-id ID --output PATH
-verify_resume.py --state PATH --target-root PATH --manifest PATH --output PATH [--workspace-root PATH]
+verify_resume.py --state PATH --target-root PATH --manifest PATH --output PATH [--workspace-root PATH] [--verifier-root PATH]
 evaluate_migration.py --baseline PATH --source PATH --target PATH --parity PATH --contract PATH --manifest PATH --state PATH --output PATH [--plan PATH --workspace-root PATH]
 advance_milestone.py --state PATH --result PATH --milestone-id ID --target-root PATH [--plan PATH --manifest PATH --output PATH]
 ```

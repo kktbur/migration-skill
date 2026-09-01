@@ -134,8 +134,16 @@ python scripts/verify_resume.py \
   --target-root TARGET \
   --manifest .migration/freeze-manifest.json \
   --output .migration/results/resume-preflight.json \
-  --workspace-root WORKSPACE
+  --workspace-root WORKSPACE \
+  --verifier-root INSTALLED_PLUGIN/skills/migration-skill/scripts
 ```
+
+When running from a raw Skill checkout, `--verifier-root` may be omitted. When
+running from an installed Plugin, it should point at the active Plugin's
+verifier bundle. Resume is valid only when that bundle has the same file labels
+and SHA-256 hashes as the frozen bundle. A mismatch is an
+`verifier-bundle-mismatch` invalidation; it must not silently replace the
+workspace-local frozen verifier.
 
 Then run checks/parity for the current milestone and evaluate only that milestone:
 

@@ -84,6 +84,8 @@ class PluginPackagingTest(unittest.TestCase):
         self.assertEqual(policy["protocol"]["freeze_schema"], 3)
         self.assertTrue(policy["in_progress_migration"]["verify_frozen_bundle_before_use"])
         self.assertTrue(policy["in_progress_migration"]["plugin_update_cannot_replace_bundle"])
+        self.assertEqual(policy["lifecycle_validation"]["host_session_checks"], "manual-required")
+        self.assertEqual(policy["lifecycle_validation"]["host_execution_default"], "disabled")
 
     def test_adr_covers_lifecycle_and_frozen_verifier_boundary(self):
         self.assertTrue(ADR_PATH.is_file())
@@ -100,6 +102,21 @@ class PluginPackagingTest(unittest.TestCase):
             "raw skill",
         ):
             self.assertIn(phrase, text)
+
+    def test_lifecycle_validation_assets_are_published_without_host_side_effects(self):
+        lifecycle_root = ROOT / "tests" / "plugin_lifecycle"
+        for name in (
+            "fresh-install.md",
+            "upgrade.md",
+            "rollback.md",
+            "uninstall-reinstall.md",
+            "lifecycle_support.py",
+            "run_host_lifecycle.py",
+            "test_lifecycle.py",
+        ):
+            self.assertTrue((lifecycle_root / name).is_file(), name)
+        self.assertTrue((ROOT / "docs" / "plugin-lifecycle-test-report.md").is_file())
+        self.assertTrue((lifecycle_root / "marketplace" / ".agents" / "plugins" / "marketplace.json").is_file())
 
 
 if __name__ == "__main__":

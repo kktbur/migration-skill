@@ -128,6 +128,14 @@ The following invariants apply:
 5. `advance_milestone.py` remains the only authority that atomically accepts a
    verified checkpoint; Plugin lifecycle actions never advance a milestone.
 
+When the active Skill comes from a Plugin cache, resume callers should pass
+that installation's `skills/migration-skill/scripts/` directory to
+`verify_resume.py --verifier-root`. The preflight compares the installed
+bundle's labels and hashes with the frozen bundle and returns an explicit
+`verifier-bundle-mismatch` invalidation before any target edit. A raw Skill
+checkout may omit this option because its verifier root is already the one
+selected by the caller.
+
 Where the Plugin host uses a mutable installation cache, a migration should
 use a workspace-local or copied verifier bundle whose hashes are recorded in
 the Freeze manifest. The package update can change the Skill instructions for

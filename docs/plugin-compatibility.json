@@ -29,5 +29,11 @@
     "plugin_update_cannot_replace_bundle": true,
     "on_bundle_mismatch": "invalidate-and-rebuild-evidence",
     "preserve_migration_workspace": true
+  },
+  "lifecycle_validation": {
+    "offline_model_tests": "tests/plugin_lifecycle/test_lifecycle.py",
+    "host_probe": "tests/plugin_lifecycle/run_host_lifecycle.py",
+    "host_session_checks": "manual-required",
+    "host_execution_default": "disabled"
   }
 }

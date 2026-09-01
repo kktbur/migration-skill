@@ -2,16 +2,23 @@
 
 This document records deferred work so future contributors do not silently expand the v1 safety model.
 
-## Plugin distribution (v0.2 candidate)
+## Plugin distribution (v0.2 lifecycle validation)
 
-The current repository is a raw, repository-scoped Skill package. A future Plugin wrapper may add a `.codex-plugin/plugin.json`, packaging metadata, and an installation path, but it must keep the Skill's deterministic scripts and references unchanged. Plugin registration is distribution plumbing; it is not a replacement for the Contract/Judge/Freeze protocol.
+The repository now contains a skills-only Plugin at `.codex-plugin/plugin.json`
+and the canonical raw Skill under `skills/migration-skill/`. The remaining v0.2
+work is host-level lifecycle validation: fresh install, discovery, explicit
+invocation, upgrade mismatch detection, rollback, uninstall, and reinstall.
+Plugin registration is distribution plumbing; it is not a replacement for the
+Contract/Judge/Freeze protocol.
 
-Before shipping a Plugin wrapper:
+Before calling the Plugin lifecycle complete:
 
 1. validate the package in a fresh Codex session;
 2. document the exact installed `SKILL.md` path and trigger behavior;
-3. preserve the standard-library-only offline test path;
-4. review permissions and do not make GitHub, Exa, MCP, or network access hard dependencies.
+3. prove that an incompatible active verifier bundle blocks resume;
+4. prove rollback and reinstall preserve `.migration/` and Target evidence;
+5. preserve the standard-library-only offline test path;
+6. review permissions and do not make GitHub, Exa, MCP, or network access hard dependencies.
 
 ## In-place and strangler migration
 

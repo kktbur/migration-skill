@@ -72,6 +72,10 @@ install, upgrade, rollback, uninstall, and frozen-verifier rules are recorded
 in [`docs/adr/0001-plugin-distribution.md`](docs/adr/0001-plugin-distribution.md).
 Updating the Plugin cannot silently replace the verifier bundle frozen for an
 in-progress migration; resume preflight must verify the recorded bundle first.
+The host-level lifecycle probe and its current evidence are documented in
+[`docs/plugin-lifecycle-test-report.md`](docs/plugin-lifecycle-test-report.md).
+The probe is manual-only by default; use `--execute-host` only when changing
+the local Codex marketplace and Plugin cache is explicitly authorized.
 
 ## Adapter protocol
 

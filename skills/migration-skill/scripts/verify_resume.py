@@ -19,6 +19,7 @@ try:
         load_json,
         sha256_file,
         tree_digest,
+        verify_verifier_bundle,
         verify_freeze,
         write_json,
     )
@@ -34,6 +35,7 @@ except ImportError:  # pragma: no cover
         load_json,
         sha256_file,
         tree_digest,
+        verify_verifier_bundle,
         verify_freeze,
         write_json,
     )
@@ -50,6 +52,7 @@ def verify_resume(
     output_path: Path,
     *,
     workspace_root: Path | None = None,
+    verifier_root: Path | None = None,
     freeze_checker: Callable[[Path], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Return whether it is safe to start editing the target again.
@@ -89,6 +92,19 @@ def verify_resume(
         return report
 
     manifest = freeze.get("manifest", {})
+    active_bundle: dict[str, Any] | None = None
+    if verifier_root is not None:
+        try:
+            active_bundle = verify_verifier_bundle(manifest, verifier_root)
+        except FrozenStateError as exc:
+            report = _invalid(
+                "verifier-bundle-mismatch",
+                error=str(exc),
+                freeze_intact=True,
+                active_verifier_root=str(canonical_path(verifier_root)),
+            )
+            write_json(output_path, report)
+            return report
     source = manifest.get("source", {}) if isinstance(manifest, dict) else {}
     if state.get("source_revision") is not None and state.get("source_revision") != source.get("revision"):
         report = _invalid(
@@ -109,6 +125,7 @@ def verify_resume(
             "freeze_intact": True,
             "checkpoint": None,
             "target_root": str(target_root),
+            "active_verifier_bundle": active_bundle,
         }
         write_json(output_path, report)
         return report
@@ -147,6 +164,7 @@ def verify_resume(
         "expected_freeze_manifest_sha256": manifest_digest,
         "actual_freeze_manifest_sha256": sha256_file(manifest_path),
         "freeze_manifest_matches": manifest_matches,
+        "active_verifier_bundle": active_bundle,
     }
     if not valid:
         report["reason"] = "target-or-freeze-changed"
@@ -161,6 +179,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--manifest", required=True, help="freeze-manifest.json")
     parser.add_argument("--output", required=True, help="resume preflight result JSON")
     parser.add_argument("--workspace-root", help="relocation workspace root")
+    parser.add_argument(
+        "--verifier-root",
+        help="currently installed verifier bundle root; compare it with the frozen bundle before resume",
+    )
     return parser
 
 
@@ -172,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
         Path(args.manifest),
         Path(args.output),
         workspace_root=Path(args.workspace_root) if args.workspace_root else None,
+        verifier_root=Path(args.verifier_root) if args.verifier_root else None,
     )
     return EXIT_OK if report["valid"] else EXIT_FAILED
 

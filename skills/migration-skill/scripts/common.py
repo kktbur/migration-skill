@@ -790,6 +790,61 @@ def _bundle_files(root: Path) -> dict[str, Path]:
     return files
 
 
+def verify_verifier_bundle(
+    manifest: Mapping[str, Any],
+    active_root: str | os.PathLike[str],
+) -> dict[str, Any]:
+    """Verify an installed verifier bundle against frozen file hashes.
+
+    A Plugin host may keep the currently installed Skill in a mutable cache,
+    while an in-progress migration owns a separate frozen workspace.  The
+    workspace freeze is still authoritative, but a resume must not silently
+    run a different installed verifier.  This helper compares the active
+    bundle by stable relative file labels and SHA-256; it never copies or
+    replaces either bundle.
+    """
+
+    if not isinstance(manifest, Mapping):
+        raise FrozenStateError("freeze manifest 必须是对象")
+    bundle = manifest.get("verifier_bundle")
+    if not isinstance(bundle, Mapping):
+        raise FrozenStateError("freeze manifest 缺少 verifier_bundle")
+    entries = bundle.get("files")
+    if not isinstance(entries, Mapping) or not entries:
+        raise FrozenStateError("freeze manifest.verifier_bundle.files 无效")
+
+    active_path = canonical_path(active_root)
+    actual_bundle = _bundle_files(active_path)
+    expected_labels = {str(label) for label in entries}
+    actual_labels = set(actual_bundle)
+    missing = sorted(expected_labels - actual_labels)
+    unexpected = sorted(actual_labels - expected_labels)
+    changed: list[str] = []
+    for label in sorted(expected_labels & actual_labels):
+        entry = entries.get(label)
+        if not isinstance(entry, Mapping) or not isinstance(entry.get("sha256"), str):
+            raise FrozenStateError(f"冻结 verifier bundle 条目无效: {label}")
+        if entry["sha256"] != sha256_file(actual_bundle[label]):
+            changed.append(label)
+    if missing or unexpected or changed:
+        details = []
+        if missing:
+            details.append("missing=" + ",".join(missing))
+        if unexpected:
+            details.append("unexpected=" + ",".join(unexpected))
+        if changed:
+            details.append("changed=" + ",".join(changed))
+        raise FrozenStateError(
+            "active verifier bundle 与冻结 bundle 不一致: "
+            + "; ".join(details)
+        )
+    return {
+        "intact": True,
+        "root": str(active_path),
+        "files": sorted(actual_labels),
+    }
+
+
 def _verify_file_entries(
     entries: Mapping[str, Any],
     label: str,

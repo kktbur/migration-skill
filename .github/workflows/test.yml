@@ -43,3 +43,9 @@ jobs:
 
       - name: Validate Skill package
         run: python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill
+
+      - name: Compile lifecycle probe
+        run: >-
+          python -m py_compile
+          tests/plugin_lifecycle/lifecycle_support.py
+          tests/plugin_lifecycle/run_host_lifecycle.py
