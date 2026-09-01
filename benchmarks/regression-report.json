@@ -11,6 +11,18 @@
       "broken_target_rejection": {
         "controls": [
           {
+            "executions": {
+              "compare": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              },
+              "parity": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              }
+            },
             "expected_cases": [
               "normal-json",
               "normal-text",
@@ -65,6 +77,48 @@
         },
         "passed": true,
         "status": "VERIFIED"
+      },
+      "executions": {
+        "contract_validation": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "evaluator": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "parity_compare": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "resume_preflight": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "source_checks": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "source_parity": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "target_checks": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "target_parity": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        }
       },
       "failure_reasons": [],
       "parity_compare": {
@@ -136,6 +190,18 @@
       "broken_target_rejection": {
         "controls": [
           {
+            "executions": {
+              "compare": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              },
+              "parity": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              }
+            },
             "expected_cases": [
               "default-greet"
             ],
@@ -143,6 +209,18 @@
             "path": "broken-default"
           },
           {
+            "executions": {
+              "compare": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              },
+              "parity": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              }
+            },
             "expected_cases": [
               "empty-name-error"
             ],
@@ -150,6 +228,18 @@
             "path": "broken-error"
           },
           {
+            "executions": {
+              "compare": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              },
+              "parity": {
+                "error": null,
+                "exit_code": 0,
+                "timed_out": false
+              }
+            },
             "expected_cases": [
               "named-add"
             ],
@@ -206,6 +296,48 @@
         },
         "passed": true,
         "status": "VERIFIED"
+      },
+      "executions": {
+        "contract_validation": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "evaluator": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "parity_compare": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "resume_preflight": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "source_checks": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "source_parity": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "target_checks": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        },
+        "target_parity": {
+          "error": null,
+          "exit_code": 0,
+          "timed_out": false
+        }
       },
       "failure_reasons": [],
       "parity_compare": {

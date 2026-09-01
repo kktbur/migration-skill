@@ -352,6 +352,14 @@ def _read_result(path: Path) -> dict[str, Any]:
     return document
 
 
+def _execution_summary(execution: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "exit_code": execution.get("exit_code"),
+        "timed_out": execution.get("timed_out", False),
+        "error": execution.get("error"),
+    }
+
+
 def _helper_script(run_root: Path, name: str) -> Path:
     path = run_root / "migration-skill" / "scripts" / name
     if not path.is_file():
@@ -634,6 +642,10 @@ def _replay_run(
                     "path": target_spec["path"],
                     "expected_cases": expected_cases,
                     "passed": passed,
+                    "executions": {
+                        "parity": _execution_summary(negative_parity_exec),
+                        "compare": _execution_summary(negative_compare_exec),
+                    },
                 }
             )
 
@@ -647,6 +659,16 @@ def _replay_run(
             else None,
             "contract_validation": {
                 "passed": validation_exec.get("exit_code") == 0 and isinstance(validation, dict) and validation.get("status") == "valid"
+            },
+            "executions": {
+                "contract_validation": _execution_summary(validation_exec),
+                "resume_preflight": _execution_summary(resume_exec),
+                "source_checks": _execution_summary(source_exec),
+                "target_checks": _execution_summary(target_exec),
+                "source_parity": _execution_summary(source_parity_exec),
+                "target_parity": _execution_summary(target_parity_exec),
+                "parity_compare": _execution_summary(compare_exec),
+                "evaluator": _execution_summary(evaluate_exec),
             },
             "resume_preflight": {
                 "passed": resume_exec.get("exit_code") == 0 and isinstance(resume, dict) and resume.get("status") == "ready",

@@ -107,7 +107,7 @@ class RegressionHarnessTest(unittest.TestCase):
             run_ids=["20260831-python-cli-to-node-cli-001"],
         )
 
-        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["status"], "passed", report)
         self.assertEqual(
             report["summary"],
             {"total": 1, "passed": 1, "failed": 0, "blocked": 0, "invalid": 0},
