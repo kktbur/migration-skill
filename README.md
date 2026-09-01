@@ -66,10 +66,12 @@ The repository root is a skills-only Codex Plugin. Its manifest is
 when adding this repository to a Codex Plugin marketplace, and prefer a
 reviewed release tag or Git ref for reproducible installation.
 
-The current Plugin package is `0.2.0`. Its compatibility policy is recorded in
+The current Plugin release candidate is `0.2.0-rc.1`. Its compatibility policy is recorded in
 [`docs/plugin-compatibility.json`](docs/plugin-compatibility.json), and the
 install, upgrade, rollback, uninstall, and frozen-verifier rules are recorded
 in [`docs/adr/0001-plugin-distribution.md`](docs/adr/0001-plugin-distribution.md).
+The release-candidate scope is recorded in
+[`docs/releases/v0.2.0-rc.1.md`](docs/releases/v0.2.0-rc.1.md).
 Updating the Plugin cannot silently replace the verifier bundle frozen for an
 in-progress migration; resume preflight must verify the recorded bundle first.
 The host-level lifecycle probe and its current evidence are documented in
@@ -159,15 +161,17 @@ python skills/migration-skill/scripts/validate_skill.py --root skills/migration-
 python benchmarks/run_regression.py --root . --run-id 20260831-python-cli-to-node-cli-001 --run-id 20260831-commonjs-to-esm-001 --output regression-smoke.json
 ```
 
-GitHub Actions runs these checks on both Ubuntu and Windows. The CI replay is
-limited to the dependency-free Python CLI and CommonJS → ESM runs; the Flask →
-FastAPI replay requires the benchmark's documented Python packages and can be
-run with an explicit interpreter. The Windows job keeps the core unit,
-compile, and Skill validation checks, but skips the historical Python CLI
-replay smoke because its frozen Source test decodes Unicode through the host
-Windows code page; run that replay locally with a UTF-8-compatible environment
-when needed. Tests use `unittest` and temporary directories and do not require
-Docker, network access, or third-party packages.
+GitHub Actions runs these checks on both Ubuntu and Windows. The regular matrix
+job remains dependency-free; a separate Ubuntu Python 3.12
+`benchmark-regression` job installs the exact benchmark-only requirements from
+[`benchmarks/cases/flask-to-fastapi/requirements.txt`](benchmarks/cases/flask-to-fastapi/requirements.txt)
+and gates on all three published runs returning `VERIFIED`. The Windows matrix
+job keeps the core unit, compile, and Skill validation checks, but skips the
+historical Python CLI replay smoke because its frozen Source test decodes
+Unicode through the host Windows code page; run that replay locally with a
+UTF-8-compatible environment when needed. Tests use `unittest` and temporary
+directories and do not require Docker, network access, or third-party packages
+outside the dedicated benchmark job.
 
 ## Benchmarks and limits
 

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "plugin": {
     "name": "migration-skill",
-    "version": "0.2.0"
+    "version": "0.2.0-rc.1"
   },
   "protocol": {
     "contract_schema": 2,
@@ -10,10 +10,10 @@
   },
   "supported_combinations": [
     {
-      "plugin_range": "0.2.x",
+      "plugin_range": "0.2.0-rc.1",
       "contract_schema": 2,
       "freeze_schema": 3,
-      "status": "supported"
+      "status": "release-candidate"
     }
   ],
   "future_combinations": [

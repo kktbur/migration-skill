@@ -1,7 +1,7 @@
 # Plugin lifecycle test report
 
 Date: 2026-09-01  
-Plugin: `migration-skill` `0.2.0`  
+Lifecycle baseline: `migration-skill` `0.2.0`; release candidate: `0.2.0-rc.1`  
 Protocol: Contract schema `2`, Freeze schema `3`  
 Codex CLI observed: `0.147.0`
 
@@ -15,8 +15,8 @@ uninstall/reinstall in a workspace-isolated `CODEX_HOME`. The model-backed
 new-session invocation and Agent-generated Plugin dogfood remain blocked by
 the host's TLS transport.
 
-Issue #14 remains open. This report must not be read as a release or closeout
-claim.
+Issue #14 remains open in this historical report. The release candidate must
+not be read as a final host-E2E or production-readiness claim.
 
 The default host probe still reports that the ambient environment has no
 usable `HOME`/`CODEX_HOME` for the CLI's configuration lookup. The follow-up
@@ -92,7 +92,7 @@ automate the new-session Skill-discovery or trigger checks.
 
 ## Acceptance rule
 
-Do not close Issue #14 or publish the final `v0.2.0` release until a real host
+Do not publish the final `v0.2.0` release until a real host
 has produced auditable evidence for a new-session Skill discovery, explicit
 and natural-language invocation, and Agent-generated Plugin dogfood
 migration, in addition to the lifecycle checks already recorded here. A

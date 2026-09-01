@@ -44,6 +44,13 @@ native-code isolation requires a separate sandbox.
 `regression-report.json` is a generated, path-free evidence snapshot. Recreate
 it rather than editing it when a run or verifier changes.
 
+GitHub Actions has a separate `benchmark-regression` job. It installs the
+exact Flask, FastAPI, and HTTPX versions listed in
+[`cases/flask-to-fastapi/requirements.txt`](cases/flask-to-fastapi/requirements.txt),
+then replays all three matrix entries. The job fails if any run is `FAILED`,
+`INVALID`, `BLOCKED`, or not `VERIFIED`; the normal unit-test job does not
+install these benchmark-only dependencies.
+
 The published Python CLI Source test is locale-sensitive on Windows because
 the historical fixture did not pin subprocess text encoding. The Windows CI
 job therefore does not run that replay smoke; it still runs the full protocol

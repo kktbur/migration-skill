@@ -48,7 +48,7 @@ class PluginLifecycleTest(unittest.TestCase):
             self.assertEqual(entry["source"]["path"], "./plugins/migration-skill")
             manifest = json.loads((staged["plugin_root"] / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["name"], "migration-skill")
-            self.assertEqual(manifest["version"], "0.2.0")
+            self.assertEqual(manifest["version"], "0.2.0-rc.1")
             self.assertEqual(manifest["skills"], "./skills/")
             self.assertTrue((staged["plugin_root"] / "skills" / "migration-skill" / "SKILL.md").is_file())
             self.assertFalse((staged["plugin_root"] / ".migration").exists())

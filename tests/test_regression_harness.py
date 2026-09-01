@@ -13,6 +13,7 @@ from pathlib import Path
 from benchmarks.run_regression import (
     discover_runs,
     load_matrix,
+    load_protocol_metadata,
     run_regression,
     validate_matrix,
 )
@@ -36,6 +37,30 @@ class RegressionHarnessTest(unittest.TestCase):
                 "20260831-commonjs-to-esm-001",
             ],
         )
+
+    def test_flask_benchmark_dependencies_are_exactly_pinned(self):
+        requirements_path = (
+            REPO_ROOT
+            / "benchmarks"
+            / "cases"
+            / "flask-to-fastapi"
+            / "requirements.txt"
+        )
+        requirements = [
+            line.strip()
+            for line in requirements_path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+
+        self.assertEqual(
+            requirements,
+            [
+                "Flask==3.1.3",
+                "fastapi==0.141.1",
+                "httpx==0.28.1",
+            ],
+        )
+        self.assertTrue(all("==" in requirement for requirement in requirements))
 
     def test_matrix_rejects_duplicate_runs_and_absolute_negative_paths(self):
         matrix = {
@@ -121,6 +146,39 @@ class RegressionHarnessTest(unittest.TestCase):
         self.assertEqual(report["runs"][0]["status"], "passed")
         self.assertEqual(report["runs"][0]["evaluator"]["status"], "VERIFIED")
         self.assertTrue(report["runs"][0]["broken_target_rejection"]["passed"])
+        plugin = json.loads(
+            (REPO_ROOT / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(report["plugin_version"], plugin["version"])
+        self.assertEqual(report["schema_version"], 2)
+        self.assertEqual(
+            report["protocol"],
+            {"contract_schema": 2, "freeze_schema": 3},
+        )
+        self.assertEqual(report["runtime"]["python"], report["runtime"]["python_version"])
+        self.assertEqual(report["runtime"]["node"], report["runtime"]["node_version"])
+
+    def test_protocol_metadata_rejects_manifest_policy_version_drift(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / ".codex-plugin").mkdir()
+            (root / "docs").mkdir()
+            (root / ".codex-plugin" / "plugin.json").write_text(
+                json.dumps({"version": "0.2.0-rc.1"}),
+                encoding="utf-8",
+            )
+            (root / "docs" / "plugin-compatibility.json").write_text(
+                json.dumps(
+                    {
+                        "plugin": {"version": "0.2.0"},
+                        "protocol": {"contract_schema": 2, "freeze_schema": 3},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(ValueError):
+                load_protocol_metadata(root)
 
     def test_missing_runtime_dependency_is_blocked_not_reported_as_regression(self):
         matrix = {

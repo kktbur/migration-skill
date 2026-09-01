@@ -42,7 +42,7 @@ uninstall lifecycle. It does not add an LLM SDK, MCP server, Docker
 orchestrator, background Agent Runtime, or production integration.
 
 The machine-readable compatibility policy is kept in
-`docs/plugin-compatibility.json`. The current package is Plugin `0.2.0`, with
+`docs/plugin-compatibility.json`. The current release candidate is Plugin `0.2.0-rc.1`, with
 Contract schema `2` and Freeze schema `3`.
 
 ## Version compatibility
@@ -52,7 +52,7 @@ domains:
 
 | Plugin range | Contract schema | Freeze schema | Policy |
 | --- | ---: | ---: | --- |
-| `0.2.x` | 2 | 3 | Supported by this package |
+| `0.2.0-rc.1` | 2 | 3 | Release candidate; supported by this package |
 | `0.3.x` | 3 | 4 | Future; migration required |
 
 A Plugin patch update may fix packaging or documentation without changing the

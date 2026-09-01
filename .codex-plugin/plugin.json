@@ -1,6 +1,6 @@
 {
   "name": "migration-skill",
-  "version": "0.2.0",
+  "version": "0.2.0-rc.1",
   "description": "A Codex-native protocol for behavior-preserving codebase migration with a frozen deterministic verifier.",
   "author": {
     "name": "kktbur",

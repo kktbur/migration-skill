@@ -20,7 +20,7 @@ class PluginPackagingTest(unittest.TestCase):
         manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
 
         self.assertEqual(manifest["name"], "migration-skill")
-        self.assertEqual(manifest["version"], "0.2.0")
+        self.assertEqual(manifest["version"], "0.2.0-rc.1")
         self.assertEqual(manifest["skills"], "./skills/")
         self.assertNotIn("mcpServers", manifest)
         self.assertNotIn("apps", manifest)
@@ -79,7 +79,7 @@ class PluginPackagingTest(unittest.TestCase):
         policy = json.loads(COMPATIBILITY_PATH.read_text(encoding="utf-8"))
 
         self.assertEqual(policy["plugin"]["name"], "migration-skill")
-        self.assertEqual(policy["plugin"]["version"], "0.2.0")
+        self.assertEqual(policy["plugin"]["version"], "0.2.0-rc.1")
         self.assertEqual(policy["protocol"]["contract_schema"], 2)
         self.assertEqual(policy["protocol"]["freeze_schema"], 3)
         self.assertTrue(policy["in_progress_migration"]["verify_frozen_bundle_before_use"])

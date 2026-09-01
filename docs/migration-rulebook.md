@@ -62,6 +62,63 @@ an explicit interpreter with `--python-executable` or
 `--node-executable`, or run the benchmark in its documented isolated
 environment. The harness never installs dependencies or requires a model.
 
+## Benchmark-derived rules
+
+The following rules are extracted from the three published benchmark runs.
+They are engineering guidance, not implicit permission to weaken a Contract.
+Each rule becomes enforceable only when the relevant behavior is represented by
+an operation, a Corpus case, and a frozen comparator.
+
+### A. Behavioral semantics
+
+| Field | Rule |
+| --- | --- |
+| Rule | Target idioms and framework defaults must not silently replace Source observable behavior. |
+| Observed benchmark | All three migrations preserved explicit success and error behavior; the published broken Targets changed a greeting, status, field, or export and were rejected. |
+| Failure | A migration can compile while changing an error status, error message/type, returned field, or numeric/string semantics. |
+| Correct migration behavior | Preserve the Source contract first; use Target-native idioms only when they produce the same observed result. |
+| Verification mechanism | Required operations and cases, exact or JSON-semantic comparators, and named negative controls. |
+
+### B. HTTP migration
+
+| Field | Rule |
+| --- | --- |
+| Rule | Treat status codes, headers, content type, serialization, Unicode, and empty-body behavior as public API. |
+| Observed benchmark | Flask → FastAPI required preserving `400` versus `422`, `404` behavior, header output, Unicode transport, and the frozen `204` response semantics. |
+| Failure | Framework defaults changed validation status or added a content type to an empty response; those differences required explicit repairs. |
+| Correct migration behavior | Define each required route operation and compare the status, relevant headers, body shape/types, and encoding-sensitive values explicitly. |
+| Verification mechanism | HTTP adapter cases covering happy, error, boundary, and Unicode inputs, plus targeted broken-Target controls. |
+
+### C. CLI migration
+
+| Field | Rule |
+| --- | --- |
+| Rule | Preserve exit codes, stdout/stderr separation, argument errors, working-directory assumptions, and text encoding. |
+| Observed benchmark | Python CLI → Node CLI needed a Target test runner independent of the caller working directory and explicit UTF-8 decoding for Node output on Windows. |
+| Failure | A test or adapter that depends on the caller's current directory or host code page can produce false parity failures or hide a real encoding change. |
+| Correct migration behavior | Give checks an explicit `cwd`, keep stdout/stderr observable, preserve exit semantics, and make adapter transport encoding explicit. |
+| Verification mechanism | CLI check results plus Corpus cases for normal, invalid, missing-argument, Unicode, and boundary inputs. |
+
+### D. Module migration
+
+| Field | Rule |
+| --- | --- |
+| Rule | Preserve default and named exports, package entrypoints, importability, error type/message, and validation boundaries. |
+| Observed benchmark | CommonJS → ESM preserved default/named exports, package self-reference, `TypeError` names/messages, finite-number validation, and Unicode behavior. |
+| Failure | A module-format rewrite may make the package load while changing which export is default, how consumers resolve the entrypoint, or which error is thrown. |
+| Correct migration behavior | Map every public export to an explicit operation and keep package metadata and error semantics aligned with the Source. |
+| Verification mechanism | Module-level adapter cases for default export, named export, invalid input, and error behavior; broken exports must fail. |
+
+### E. Cross-platform execution
+
+| Field | Rule |
+| --- | --- |
+| Rule | Treat line endings, Windows code pages, filesystem paths, current working directory, and Unicode as portability inputs. |
+| Observed benchmark | The published runs exposed UTF-8 transport and working-directory assumptions; the regression harness also keeps Windows CI separate from the historical locale-sensitive Python replay. |
+| Failure | A green result on one host can be caused by an implicit locale, path separator, or inherited working directory rather than by equivalent behavior. |
+| Correct migration behavior | Pin encodings where the adapter owns the boundary, use explicit paths/cwd, and report host-specific limitations instead of suppressing them. |
+| Verification mechanism | Cross-platform CI, path-independent fixtures, explicit environment policy, and a reported `blocked` state when a host cannot provide the required runtime. |
+
 ## Baseline and regression policy
 
 Failures present in the captured Source baseline are `inherited_failures`.

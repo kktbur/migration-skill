@@ -15,7 +15,10 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Iterable
 
 
-SCHEMA_VERSION = 1
+MATRIX_SCHEMA_VERSION = 1
+REPORT_SCHEMA_VERSION = 2
+# Backwards-compatible name for callers that import the matrix schema constant.
+SCHEMA_VERSION = MATRIX_SCHEMA_VERSION
 DEFAULT_MATRIX_NAME = "regression-matrix.json"
 REQUIRED_RUN_FILES = (
     "report.json",
@@ -52,6 +55,47 @@ def _load_json(path: Path) -> Any:
             return json.load(handle)
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError(f"无法读取 JSON: {path}: {exc}") from exc
+
+
+def load_protocol_metadata(repo_root: Path) -> dict[str, Any]:
+    """Load the Plugin and protocol versions used by a replay report."""
+
+    manifest = _load_json(repo_root / ".codex-plugin" / "plugin.json")
+    compatibility = _load_json(repo_root / "docs" / "plugin-compatibility.json")
+    if not isinstance(manifest, dict):
+        raise ValueError("Plugin manifest must be an object")
+    if not isinstance(compatibility, dict):
+        raise ValueError("Plugin compatibility policy must be an object")
+
+    plugin_version = manifest.get("version")
+    compatibility_plugin = compatibility.get("plugin")
+    protocol = compatibility.get("protocol")
+    if not isinstance(plugin_version, str) or not plugin_version:
+        raise ValueError(".codex-plugin/plugin.json.version must be a non-empty string")
+    if not isinstance(compatibility_plugin, dict):
+        raise ValueError("docs/plugin-compatibility.json.plugin must be an object")
+    if compatibility_plugin.get("version") != plugin_version:
+        raise ValueError("Plugin manifest and compatibility policy versions differ")
+    if not isinstance(protocol, dict):
+        raise ValueError("docs/plugin-compatibility.json.protocol must be an object")
+
+    contract_schema = protocol.get("contract_schema")
+    freeze_schema = protocol.get("freeze_schema")
+    if (
+        not isinstance(contract_schema, int)
+        or isinstance(contract_schema, bool)
+        or not isinstance(freeze_schema, int)
+        or isinstance(freeze_schema, bool)
+    ):
+        raise ValueError("protocol contract_schema and freeze_schema must be integers")
+
+    return {
+        "plugin_version": plugin_version,
+        "protocol": {
+            "contract_schema": contract_schema,
+            "freeze_schema": freeze_schema,
+        },
+    }
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -711,6 +755,7 @@ def run_regression(
     if timeout_seconds <= 0:
         raise ValueError("timeout_seconds must be positive")
     repo_root = repo_root.resolve()
+    protocol_metadata = load_protocol_metadata(repo_root)
     matrix = load_matrix(matrix_path or repo_root / "benchmarks" / DEFAULT_MATRIX_NAME)
     entries = {entry["run_id"]: entry for entry in matrix["runs"]}
     selected_ids = list(run_ids) if run_ids is not None else list(entries)
@@ -736,7 +781,9 @@ def run_regression(
     else:
         status = "passed"
     return {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "plugin_version": protocol_metadata["plugin_version"],
+        "protocol": protocol_metadata["protocol"],
         "status": status,
         "offline_policy": {
             "model_required": False,
@@ -746,6 +793,8 @@ def run_regression(
         },
         "runtime": {
             "platform": platform.system(),
+            "python": platform.python_version(),
+            "node": _node_version(variables["NODE"]),
             "python_version": platform.python_version(),
             "node_version": _node_version(variables["NODE"]),
             "runtime_override": {

@@ -5,6 +5,11 @@
     "network_isolation_guaranteed": false,
     "network_required": false
   },
+  "plugin_version": "0.2.0-rc.1",
+  "protocol": {
+    "contract_schema": 2,
+    "freeze_schema": 3
+  },
   "runs": [
     {
       "benchmark": "Python CLI -> Node CLI",
@@ -390,15 +395,17 @@
     }
   ],
   "runtime": {
+    "node": "v24.19.0",
     "node_version": "v24.19.0",
     "platform": "Windows",
+    "python": "3.12.13",
     "python_version": "3.12.13",
     "runtime_override": {
       "node": false,
       "python": false
     }
   },
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "blocked",
   "summary": {
     "blocked": 1,
