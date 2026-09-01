@@ -45,6 +45,7 @@ jobs:
         run: python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill
 
       - name: Replay dependency-free published benchmarks
+        if: runner.os != 'Windows'
         run: >-
           python benchmarks/run_regression.py
           --root .

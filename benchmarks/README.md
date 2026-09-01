@@ -44,6 +44,12 @@ native-code isolation requires a separate sandbox.
 `regression-report.json` is a generated, path-free evidence snapshot. Recreate
 it rather than editing it when a run or verifier changes.
 
+The published Python CLI Source test is locale-sensitive on Windows because
+the historical fixture did not pin subprocess text encoding. The Windows CI
+job therefore does not run that replay smoke; it still runs the full protocol
+unit suite, compilation, and Skill validation. A local Windows run with a
+compatible UTF-8 environment can execute the same harness directly.
+
 ## Planned matrix
 
 | Migration | What it demonstrates | Current status |

@@ -162,8 +162,12 @@ python benchmarks/run_regression.py --root . --run-id 20260831-python-cli-to-nod
 GitHub Actions runs these checks on both Ubuntu and Windows. The CI replay is
 limited to the dependency-free Python CLI and CommonJS → ESM runs; the Flask →
 FastAPI replay requires the benchmark's documented Python packages and can be
-run with an explicit interpreter. Tests use `unittest` and temporary
-directories and do not require Docker, network access, or third-party packages.
+run with an explicit interpreter. The Windows job keeps the core unit,
+compile, and Skill validation checks, but skips the historical Python CLI
+replay smoke because its frozen Source test decodes Unicode through the host
+Windows code page; run that replay locally with a UTF-8-compatible environment
+when needed. Tests use `unittest` and temporary directories and do not require
+Docker, network access, or third-party packages.
 
 ## Benchmarks and limits
 

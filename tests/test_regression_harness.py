@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -101,6 +103,10 @@ class RegressionHarnessTest(unittest.TestCase):
                 self.assertTrue((run_path / relative).exists(), f"missing {run_path.name}/{relative}")
 
     @unittest.skipUnless(shutil.which("node"), "Node.js is required for the local replay smoke test")
+    @unittest.skipIf(
+        sys.platform == "win32" and os.environ.get("CI") == "true",
+        "published fixture Source test requires a UTF-8 Windows locale; CI uses the host code page",
+    )
     def test_dependency_free_python_cli_run_replays_without_network(self):
         report = run_regression(
             REPO_ROOT,
