@@ -44,6 +44,14 @@ jobs:
       - name: Validate Skill package
         run: python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill
 
+      - name: Replay dependency-free published benchmarks
+        run: >-
+          python benchmarks/run_regression.py
+          --root .
+          --run-id 20260831-python-cli-to-node-cli-001
+          --run-id 20260831-commonjs-to-esm-001
+          --output regression-smoke.json
+
       - name: Compile lifecycle probe
         run: >-
           python -m py_compile

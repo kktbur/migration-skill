@@ -156,13 +156,36 @@ Run the same checks used by CI:
 python -m unittest discover -s tests
 python -c "from pathlib import Path; import py_compile; [py_compile.compile(str(path), doraise=True) for path in Path('skills/migration-skill/scripts').glob('*.py')]"
 python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill
+python benchmarks/run_regression.py --root . --run-id 20260831-python-cli-to-node-cli-001 --run-id 20260831-commonjs-to-esm-001 --output regression-smoke.json
 ```
 
-GitHub Actions runs these checks on both Ubuntu and Windows. Tests use `unittest` and temporary directories and do not require Docker, network access, or third-party packages.
+GitHub Actions runs these checks on both Ubuntu and Windows. The CI replay is
+limited to the dependency-free Python CLI and CommonJS → ESM runs; the Flask →
+FastAPI replay requires the benchmark's documented Python packages and can be
+run with an explicit interpreter. Tests use `unittest` and temporary
+directories and do not require Docker, network access, or third-party packages.
 
 ## Benchmarks and limits
 
 The benchmark plan covers Python CLI → Node CLI, Flask → FastAPI, and CommonJS → ESM. Benchmark cases are blind: they publish Source, Contract, Corpus, plan, and mutation metadata but no pre-made Target. Complete `VERIFIED` runs with broken-Target rejection are published at [`benchmarks/runs/20260831-python-cli-to-node-cli-001/`](benchmarks/runs/20260831-python-cli-to-node-cli-001/), [`benchmarks/runs/20260831-flask-to-fastapi-001/`](benchmarks/runs/20260831-flask-to-fastapi-001/), and [`benchmarks/runs/20260831-commonjs-to-esm-001/`](benchmarks/runs/20260831-commonjs-to-esm-001/). See [`benchmarks/README.md`](benchmarks/README.md).
+
+The dated runs also have an offline regression replay harness:
+
+```text
+python benchmarks/run_regression.py \
+  --root . \
+  --matrix benchmarks/regression-matrix.json \
+  --output benchmarks/regression-report.json
+```
+
+It replays each published run from a temporary copy using the frozen verifier
+bundle, checks the final `VERIFIED` result, and verifies the named broken-Target
+controls. It needs no model, network, or credentials. If a benchmark's
+documented third-party runtime is not installed, that run is reported as
+`blocked`; use the explicit runtime options described in the
+[`Migration Benchmark Rulebook`](docs/migration-rulebook.md). The harness uses
+`shell=False` and a minimum environment but does not claim OS-level network
+isolation.
 
 Out of scope for v1 are production deployment, production database writes, cloud mutation, a GUI, a long-running Agent Runtime, a GitHub PR bot, automatic network isolation, arbitrary monorepo one-click migration, and in-place migration without a branch/worktree boundary.
 
@@ -171,3 +194,6 @@ Out of scope for v1 are production deployment, production database writes, cloud
 The architectural lineage from `gpt-migrate`, Anthropic's Code Migration Kit, GitHub Next Crane, and sandboxed migration examples is documented in [`skills/migration-skill/references/upstream-lineage.md`](skills/migration-skill/references/upstream-lineage.md). No implementation code is copied from those projects.
 
 Please report reproducible defects, unsafe behavior, or adapter compatibility issues through the repository's [GitHub Issues](https://github.com/kktbur/migration-skill/issues). Maintenance should keep the verifier bundle, schema validation, mutation tests, cross-platform CI, and benchmark evidence in sync whenever a protocol rule changes.
+
+The benchmark maintenance and evidence rules are documented in
+[`docs/migration-rulebook.md`](docs/migration-rulebook.md).

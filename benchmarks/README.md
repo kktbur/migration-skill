@@ -18,6 +18,32 @@ Each benchmark run should preserve:
 
 Do not publish a `VERIFIED` claim from a benchmark unless the complete artifact chain is reproducible and a deliberately broken Target is rejected by the same frozen Judge.
 
+## Offline regression replay
+
+The published runs are maintained by [`run_regression.py`](run_regression.py)
+and [`regression-matrix.json`](regression-matrix.json). The harness copies each
+selected dated run to a temporary directory and replays its frozen Contract
+validation, resume preflight, checks, Source/Target parity, evaluator, and
+explicit broken-Target controls. It does not call a model, install packages,
+use credentials, or require network access.
+
+```text
+python benchmarks/run_regression.py \
+  --root . \
+  --matrix benchmarks/regression-matrix.json \
+  --output benchmarks/regression-report.json
+```
+
+Use `--python-executable` or `--node-executable` when a run's documented
+runtime dependencies are available in an explicit local environment. Missing
+dependencies are reported as `blocked`, not silently installed. The harness
+uses a minimum environment and `shell=False`, but
+`network_isolation_guaranteed` is intentionally `false`: real network or
+native-code isolation requires a separate sandbox.
+
+`regression-report.json` is a generated, path-free evidence snapshot. Recreate
+it rather than editing it when a run or verifier changes.
+
 ## Planned matrix
 
 | Migration | What it demonstrates | Current status |
@@ -40,9 +66,16 @@ benchmarks/
 │   ├── python-cli-to-node-cli/
 │   ├── flask-to-fastapi/
 │   └── commonjs-to-esm/
-└── runs/
+├── runs/
+├── regression-matrix.json
+└── regression-report.json
 ```
 
 ## Run record
 
 A published run should contain `source/`, `generated-target/`, `.migration/`, `environment.json`, `prompt.md`, `report.json`, and `report.md`. The report must state Source revision/tree digest, Target digest, Python/Node and Codex versions when available, milestone and repair counts, manual interventions, parity counts, source regressions, and the final deterministic verdict. After a `VERIFIED` run, execute the same frozen Judge against a deliberately broken Target and publish the resulting failure as negative evidence.
+
+The regression matrix is the maintenance gate for these dated records. A
+complete host with the required benchmark dependencies should return all runs
+as `passed`; a host without one of those dependencies must report that run as
+`blocked` and must not be presented as a new migration verdict.

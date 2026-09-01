@@ -1,0 +1,278 @@
+{
+  "offline_policy": {
+    "credentials_allowed": false,
+    "model_required": false,
+    "network_isolation_guaranteed": false,
+    "network_required": false
+  },
+  "runs": [
+    {
+      "benchmark": "Python CLI -> Node CLI",
+      "broken_target_rejection": {
+        "controls": [
+          {
+            "expected_cases": [
+              "normal-json",
+              "normal-text",
+              "uppercase",
+              "unicode"
+            ],
+            "passed": true,
+            "path": "broken-target"
+          }
+        ],
+        "passed": true
+      },
+      "contract_validation": {
+        "passed": true
+      },
+      "evaluator": {
+        "parity": {
+          "all_required_cases_passed": true,
+          "all_required_cases_present": true,
+          "all_required_operations_covered": true,
+          "all_required_surfaces_covered": true,
+          "covered_operations": [
+            "main-cli/invoke"
+          ],
+          "covered_surfaces": [
+            "main-cli"
+          ],
+          "declared_operations": [
+            "main-cli/invoke"
+          ],
+          "failed_cases": [],
+          "missing_cases": [],
+          "missing_operations": [],
+          "missing_surfaces": [],
+          "operation_coverage_available": true,
+          "required_cases": [
+            "empty-name",
+            "invalid-format",
+            "invalid-option",
+            "missing-argument",
+            "normal-json",
+            "normal-text",
+            "unicode",
+            "uppercase"
+          ],
+          "required_operations": [
+            "main-cli/invoke"
+          ],
+          "required_surfaces": [
+            "main-cli"
+          ]
+        },
+        "passed": true,
+        "status": "VERIFIED"
+      },
+      "failure_reasons": [],
+      "parity_compare": {
+        "passed": true,
+        "required_failed": []
+      },
+      "resume_preflight": {
+        "passed": true,
+        "status": "ready"
+      },
+      "run_id": "20260831-python-cli-to-node-cli-001",
+      "runtime_preflight": {
+        "missing": [],
+        "passed": true
+      },
+      "source_checks": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 1,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 1
+      },
+      "source_parity": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 8,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 8
+      },
+      "source_tree_digest": null,
+      "status": "passed",
+      "target_checks": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 1,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 1
+      },
+      "target_parity": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 8,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 8
+      }
+    },
+    {
+      "benchmark": "Flask to FastAPI",
+      "failure_reasons": [
+        "runtime-requirements-unavailable:fastapi,flask,httpx"
+      ],
+      "run_id": "20260831-flask-to-fastapi-001",
+      "runtime_preflight": {
+        "missing": [
+          "fastapi",
+          "flask",
+          "httpx"
+        ],
+        "passed": false
+      },
+      "status": "blocked"
+    },
+    {
+      "benchmark": "CommonJS to ESM",
+      "broken_target_rejection": {
+        "controls": [
+          {
+            "expected_cases": [
+              "default-greet"
+            ],
+            "passed": true,
+            "path": "broken-default"
+          },
+          {
+            "expected_cases": [
+              "empty-name-error"
+            ],
+            "passed": true,
+            "path": "broken-error"
+          },
+          {
+            "expected_cases": [
+              "named-add"
+            ],
+            "passed": true,
+            "path": "broken-named-add"
+          }
+        ],
+        "passed": true
+      },
+      "contract_validation": {
+        "passed": true
+      },
+      "evaluator": {
+        "parity": {
+          "all_required_cases_passed": true,
+          "all_required_cases_present": true,
+          "all_required_operations_covered": true,
+          "all_required_surfaces_covered": true,
+          "covered_operations": [
+            "package-api/default-export",
+            "package-api/error-semantics",
+            "package-api/named-export"
+          ],
+          "covered_surfaces": [
+            "package-api"
+          ],
+          "declared_operations": [
+            "package-api/default-export",
+            "package-api/error-semantics",
+            "package-api/named-export"
+          ],
+          "failed_cases": [],
+          "missing_cases": [],
+          "missing_operations": [],
+          "missing_surfaces": [],
+          "operation_coverage_available": true,
+          "required_cases": [
+            "default-greet",
+            "default-unicode",
+            "empty-name-error",
+            "invalid-add-error",
+            "named-add",
+            "named-add-float",
+            "non-string-name-error"
+          ],
+          "required_operations": [
+            "package-api/default-export",
+            "package-api/error-semantics",
+            "package-api/named-export"
+          ],
+          "required_surfaces": [
+            "package-api"
+          ]
+        },
+        "passed": true,
+        "status": "VERIFIED"
+      },
+      "failure_reasons": [],
+      "parity_compare": {
+        "passed": true,
+        "required_failed": []
+      },
+      "resume_preflight": {
+        "passed": true,
+        "status": "ready"
+      },
+      "run_id": "20260831-commonjs-to-esm-001",
+      "runtime_preflight": {
+        "missing": [],
+        "passed": true
+      },
+      "source_checks": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 1,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 1
+      },
+      "source_parity": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 7,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 7
+      },
+      "source_tree_digest": null,
+      "status": "passed",
+      "target_checks": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 3,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 3
+      },
+      "target_parity": {
+        "all_required_passed": true,
+        "failed": 0,
+        "passed": 7,
+        "required_failed": [],
+        "timed_out": 0,
+        "total": 7
+      }
+    }
+  ],
+  "runtime": {
+    "node_version": "v24.19.0",
+    "platform": "Windows",
+    "python_version": "3.12.13",
+    "runtime_override": {
+      "node": false,
+      "python": false
+    }
+  },
+  "schema_version": 1,
+  "status": "blocked",
+  "summary": {
+    "blocked": 1,
+    "failed": 0,
+    "invalid": 0,
+    "passed": 2,
+    "total": 3
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "purpose": "Offline replay matrix for published Migration Skill benchmark runs.",
+  "runs": [
+    {
+      "run_id": "20260831-python-cli-to-node-cli-001",
+      "runtime": {
+        "requires_node": true
+      },
+      "negative_targets": [
+        {
+          "path": "broken-target",
+          "expected_cases": ["normal-json", "normal-text", "uppercase", "unicode"]
+        }
+      ]
+    },
+    {
+      "run_id": "20260831-flask-to-fastapi-001",
+      "runtime": {
+        "python_modules": ["flask", "fastapi", "httpx"]
+      },
+      "negative_targets": [
+        {
+          "path": "broken-user-status",
+          "expected_cases": ["user-missing"]
+        },
+        {
+          "path": "broken-validation-status",
+          "expected_cases": ["create-missing-name"]
+        },
+        {
+          "path": "broken-user-field",
+          "expected_cases": ["user-found"]
+        }
+      ]
+    },
+    {
+      "run_id": "20260831-commonjs-to-esm-001",
+      "runtime": {
+        "requires_node": true
+      },
+      "negative_targets": [
+        {
+          "path": "broken-default",
+          "expected_cases": ["default-greet"]
+        },
+        {
+          "path": "broken-error",
+          "expected_cases": ["empty-name-error"]
+        },
+        {
+          "path": "broken-named-add",
+          "expected_cases": ["named-add"]
+        }
+      ]
+    }
+  ]
+}
