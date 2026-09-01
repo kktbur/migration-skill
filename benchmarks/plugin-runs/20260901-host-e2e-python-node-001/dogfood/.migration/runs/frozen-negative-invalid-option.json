@@ -1,0 +1,158 @@
+{
+  "cases": [
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "normal-json",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "normal-text",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "uppercase",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "unicode",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "empty-name",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": false
+        }
+      ],
+      "id": "invalid-option",
+      "operation_id": "invoke",
+      "passed": false,
+      "reason": "observable-mismatch",
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "missing-argument",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    },
+    {
+      "comparisons": [
+        {
+          "field": "__self__",
+          "mode": "json-semantic",
+          "normalization": null,
+          "passed": true
+        }
+      ],
+      "id": "invalid-format",
+      "operation_id": "invoke",
+      "passed": true,
+      "reason": null,
+      "required": true,
+      "surface_id": "main-cli"
+    }
+  ],
+  "freeze_intact": true,
+  "negative_control": true,
+  "negative_control_passed": true,
+  "negative_control_scoped": true,
+  "passed": true,
+  "schema_version": 2,
+  "source_valid": true,
+  "status": "negative_control_passed",
+  "summary": {
+    "detected_mismatch_cases": [
+      "invalid-option"
+    ],
+    "expected_mismatch_cases": [
+      "invalid-option"
+    ],
+    "failed": 1,
+    "mismatch_detected": true,
+    "optional_failed": [],
+    "passed": 7,
+    "required_failed": [
+      "invalid-option"
+    ],
+    "targeted_control_passed": true,
+    "targeted_mismatch_failures": [],
+    "total": 8
+  }
+}

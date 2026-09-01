@@ -1,0 +1,79 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-q"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+      "duration_seconds": 0.319403,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 2 tests in 0.220s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "execution_failures": [],
+  "inherited_failures": [],
+  "policy": "Existing failures are recorded as inherited; later evaluation checks only for new regressions.",
+  "profile": "source",
+  "results": [
+    {
+      "argv": [
+        "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-q"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+      "duration_seconds": 0.319403,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 2 tests in 0.220s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "revision": null,
+  "revision_after_checks": null,
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+  "runner": {
+    "platform": "win32",
+    "python": "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "source_changed_during_baseline": false,
+  "status": "captured_clean",
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  },
+  "tree_digest": "sha256:94d3221c31ce88d7a74025604bd6b762d7c1ceaf7b20fd8c51a21f97ba5b08b9",
+  "tree_digest_after_checks": "sha256:94d3221c31ce88d7a74025604bd6b762d7c1ceaf7b20fd8c51a21f97ba5b08b9"
+}

@@ -1,0 +1,25 @@
+Public copy of the Host E2E prompt; user-specific absolute paths are redacted after execution.
+
+You are performing an auditable Host E2E dogfood run for the installed Codex Plugin migration-skill version 0.2.0-rc.1.
+
+Use the installed Migration Skill that was automatically loaded for this session. Do not merely describe a plan: perform a real Python CLI -> Node CLI migration from the empty target in this run directory.
+
+The current working root contains:
+- source/ : the blind Python source fixture. It is read-only and must never be edited.
+- generated-target/ : initially empty; this is the only implementation target.
+- migration.json, parity-corpus.json, migration-plan.json, mutation-plan.json : read-only benchmark inputs. Do not weaken, delete, or edit them.
+
+Use the installed verifier bundle from the host's RC Plugin cache (public
+evidence intentionally omits the user-specific absolute path).
+
+Use the host's bundled Python runtime for helper scripts and the source adapter.
+
+Use the host's Node executable.
+
+Perform the complete protocol in the loaded skill: inventory/readiness as appropriate, validate the contract and plan, capture the Source baseline, build and validate a portable Judge, freeze the complete verifier bundle, execute bounded milestones M1/M2/M3, run the milestone gates and ratchet, and run the final deterministic evaluator. Use only the standard library and Node built-ins; do not install packages or access the network.
+
+Write only inside generated-target/, .migration/, and new evidence files in this run root. Do not edit the installed plugin cache, the repository's source files, or the four read-only benchmark inputs. Do not copy secrets. Keep the source implementation read-only throughout.
+
+After the correct target reaches the final deterministic VERIFIED result, create broken-target/ as a copy of the generated target, make one targeted required behavior mutation (for example change the normal greeting or invalid-option exit code), and run the frozen Judge against it. The broken target must be rejected and the targeted required case must be detected. Do not change the Contract, Corpus, comparator, Judge, evaluator, or freeze to make any result pass.
+
+Record a concise host-dogfood result in host-e2e-result.json and host-e2e-result.md without secrets. Only report DOGFOOD_RESULT=PASS if all of these are true: the target was generated from the empty directory, target checks pass, all required parity cases pass, the final evaluator is VERIFIED, and the frozen Judge rejects the targeted broken target. Otherwise report DOGFOOD_RESULT=FAIL and explain the first blocking condition.

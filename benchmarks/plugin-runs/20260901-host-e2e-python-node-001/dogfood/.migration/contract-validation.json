@@ -1,0 +1,7 @@
+{
+  "contract": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\.migration\\migration.json",
+  "corpus": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\.migration\\parity-corpus.json",
+  "errors": [],
+  "schema_version": 1,
+  "status": "valid"
+}

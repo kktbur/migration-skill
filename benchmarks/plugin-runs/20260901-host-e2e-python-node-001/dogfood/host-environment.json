@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "artifact_type": "host-e2e-environment-v1",
+  "plugin_version": "0.2.0-rc.1",
+  "contract_schema": 2,
+  "freeze_schema": 3,
+  "host": {
+    "os": "Windows",
+    "os_version": "Microsoft Windows NT 10.0.26200.0",
+    "codex_cli_version": "0.147.0",
+    "network_mode": "TUN (reported test condition)",
+    "model_transport_smoke": "PASS",
+    "tls_unknown_issuer": "not_reproduced"
+  },
+  "runtime": {
+    "python": "3.12.13",
+    "node": "v24.19.0"
+  },
+  "plugin_host": {
+    "marketplace": "migration-skill-dev",
+    "installation": "PASS",
+    "discovery": "PASS",
+    "enabled": true,
+    "installed_path": "omitted from public evidence"
+  },
+  "invocation": {
+    "fresh_session": "PASS",
+    "explicit": "PASS",
+    "implicit": "PASS"
+  },
+  "dogfood": {
+    "target_started_empty": true,
+    "target_generation": "current Codex implementation session",
+    "installed_plugin_agent_write_step": "BLOCKED",
+    "blocker": "nested Windows workspace-write sandbox returned helper_unknown_error: setup refresh had errors before command execution",
+    "protocol_replay": "VERIFIED",
+    "required_parity": "8/8",
+    "broken_target_rejection": "PASS"
+  },
+  "host_e2e_status": "BLOCKED",
+  "release_gate": "NOT_CLEARED"
+}

@@ -1,0 +1,29 @@
+{
+  "active_verifier_bundle": {
+    "files": [
+      "advance_milestone.py",
+      "capture_baseline.py",
+      "common.py",
+      "compare_results.py",
+      "evaluate_migration.py",
+      "evaluate_milestone.py",
+      "freeze_contract.py",
+      "inventory_project.py",
+      "run_checks.py",
+      "run_parity.py",
+      "validate_contract.py",
+      "validate_judge.py",
+      "validate_plan.py",
+      "validate_skill.py",
+      "verify_resume.py"
+    ],
+    "intact": true,
+    "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\verifier-bundle"
+  },
+  "checkpoint": null,
+  "freeze_intact": true,
+  "schema_version": 1,
+  "status": "not_started",
+  "target_root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\generated-target",
+  "valid": true
+}

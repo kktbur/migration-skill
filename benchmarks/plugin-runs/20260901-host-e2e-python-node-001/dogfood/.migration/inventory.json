@@ -1,0 +1,54 @@
+{
+  "build_commands": [],
+  "candidate_operations": [],
+  "ci": [],
+  "documentation": [],
+  "entrypoints": [],
+  "files": {
+    "by_extension": {
+      ".py": 3
+    },
+    "total": 3
+  },
+  "frameworks": {},
+  "languages": [
+    {
+      "extensions": [
+        ".py"
+      ],
+      "file_count": 3,
+      "name": "Python"
+    }
+  ],
+  "manifests": [],
+  "notes": [
+    "Inventory is evidence collection only; it does not execute project code or access the network.",
+    "Framework, entrypoint, operation and public-surface findings are candidates that require Contract confirmation.",
+    "Secret-like files are excluded by the common secret ignore policy and are never emitted as evidence content.",
+    "Agent inference is lower confidence than route, test, manifest or schema evidence."
+  ],
+  "possible_public_surfaces": [],
+  "read_only": true,
+  "risk_indicators": {
+    "file-io": [
+      "test_cli.py"
+    ],
+    "system-command": [
+      "adapter.py",
+      "test_cli.py"
+    ]
+  },
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+  "schema_version": 2,
+  "schemas": [],
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest"
+    ]
+  ],
+  "tests": [
+    "test_cli.py"
+  ]
+}

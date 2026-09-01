@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "artifact_type": "host-e2e-result-v1",
+  "test_object": {
+    "plugin_version": "0.2.0-rc.1",
+    "contract_schema": 2,
+    "freeze_schema": 3
+  },
+  "completed_host_checks": {
+    "model_transport": "PASS",
+    "plugin_installation": "PASS",
+    "plugin_discovery": "PASS",
+    "fresh_session": "PASS",
+    "explicit_invocation": "PASS",
+    "implicit_invocation": "PASS"
+  },
+  "protocol_replay": {
+    "status": "VERIFIED",
+    "target_started_empty": true,
+    "generation_mode": "current Codex implementation session",
+    "target_checks": "PASS",
+    "required_parity": {
+      "passed": 8,
+      "total": 8
+    },
+    "judge": "valid",
+    "freeze": "intact",
+    "accepted_milestones": ["M1", "M2", "M3"]
+  },
+  "broken_target": {
+    "status": "PASS",
+    "frozen_judge_rejected": true,
+    "targeted_cases": ["normal-json", "invalid-option"]
+  },
+  "missing_required_host_gate": {
+    "status": "BLOCKED",
+    "gate": "installed Plugin Agent writes the Target from an empty directory",
+    "reason": "nested Windows workspace-write sandbox returned helper_unknown_error: setup refresh had errors before command execution"
+  },
+  "status": "BLOCKED",
+  "release_gate": "NOT_CLEARED",
+  "issue_16_should_remain_open": true
+}

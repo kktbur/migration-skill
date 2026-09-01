@@ -1,0 +1,44 @@
+{
+  "profile": "source",
+  "results": [
+    {
+      "argv": [
+        "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".",
+        "-q"
+      ],
+      "cwd": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+      "duration_seconds": 0.319002,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "id": "source-tests",
+      "kind": "test",
+      "required": true,
+      "status": "passed",
+      "stderr": "----------------------------------------------------------------------\nRan 2 tests in 0.219s\n\nOK\n",
+      "stderr_truncated": false,
+      "stdout": "",
+      "stdout_truncated": false,
+      "timeout": false
+    }
+  ],
+  "root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\source",
+  "runner": {
+    "platform": "win32",
+    "python": "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "python_version": "3.12.13"
+  },
+  "schema_version": 1,
+  "summary": {
+    "all_required_passed": true,
+    "failed": 0,
+    "passed": 1,
+    "required_failed": [],
+    "timed_out": 0,
+    "total": 1
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "checkpoint": {
+    "accepted_at": "2026-09-01T14:49:36.894350+00:00",
+    "freeze_manifest_sha256": "sha256:18aa635b2e1f3e2ee17db3a9522fa3c542d7c400d645b62a987f5f0d1ce9a71c",
+    "id": "checkpoint-M2",
+    "milestone_id": "M2",
+    "protected_cases": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ],
+    "protected_checks": [
+      "target-tests"
+    ],
+    "result_digest": "sha256:1e491f17de2a661249dd78c0da78a7712b7f153f286e8154a3a916e058e802dc",
+    "result_status": "eligible",
+    "target_revision": null,
+    "target_root": "E:\\codex project\\18_20260830_Migration Skill\\migration-skill\\benchmarks\\plugin-runs\\20260901-host-e2e-python-node-001\\dogfood\\generated-target",
+    "target_tree_digest": "sha256:f6375f1fa628230204d5715e1ec904682bc64b9c477e2e66f8f27406242006dd",
+    "verification_score": 1.0
+  },
+  "milestone_id": "M2",
+  "proof_set": {
+    "cases": [
+      "invalid-format",
+      "invalid-option",
+      "missing-argument",
+      "normal-json",
+      "normal-text"
+    ],
+    "checks": [
+      "target-tests"
+    ]
+  },
+  "status": "accepted"
+}
