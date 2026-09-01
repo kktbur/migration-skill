@@ -51,8 +51,8 @@ then replays all three matrix entries. The job fails if any run is `FAILED`,
 `INVALID`, `BLOCKED`, or not `VERIFIED`; the normal unit-test job does not
 install these benchmark-only dependencies.
 
-The latest published CI evidence is [workflow run #19](https://github.com/kktbur/migration-skill/actions/runs/33524395511)
-on commit [`4f82803`](https://github.com/kktbur/migration-skill/commit/4f82803bd8469c59edc8d5547076ee6cf570d294):
+The latest published CI evidence is [workflow run #20](https://github.com/kktbur/migration-skill/actions/runs/33525975438)
+on commit [`d893b00`](https://github.com/kktbur/migration-skill/commit/d893b00137b47a5ee4e05544fac1b1a20a9c1e63):
 the benchmark-only dependency installation, all three benchmark replays, and
 the `3/3 VERIFIED` gate completed successfully. The checked-in
 `regression-report.json` remains a host-local snapshot and may legitimately be
