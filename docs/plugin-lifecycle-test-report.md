@@ -15,8 +15,10 @@ uninstall/reinstall in a workspace-isolated `CODEX_HOME`. The model-backed
 new-session invocation and Agent-generated Plugin dogfood remain blocked by
 the host's TLS transport.
 
-Issue #14 remains open in this historical report. The release candidate must
-not be read as a final host-E2E or production-readiness claim.
+The Plugin distribution acceptance tracked by Issue #14 is complete. The
+remaining model-backed host validation is tracked separately in Issue #16. The
+release candidate must not be read as a final host-E2E or production-readiness
+claim.
 
 The default host probe still reports that the ambient environment has no
 usable `HOME`/`CODEX_HOME` for the CLI's configuration lookup. The follow-up
@@ -71,7 +73,7 @@ narrower: it proves that the installed Plugin's verifier bundle can replay the
 published Source/Target evidence and preserve the lifecycle boundary. It does
 not claim that the unavailable model session generated the Target.
 
-The current local suite contains 46 tests and passes on the bundled Python
+The current local suite contains 55 tests and passes on the bundled Python
 runtime. The suite does not invoke `--execute-host`.
 
 ## Host probe
@@ -95,5 +97,6 @@ automate the new-session Skill-discovery or trigger checks.
 Do not publish the final `v0.2.0` release until a real host
 has produced auditable evidence for a new-session Skill discovery, explicit
 and natural-language invocation, and Agent-generated Plugin dogfood
-migration, in addition to the lifecycle checks already recorded here. A
-host-level `BLOCKED` result is not a successful lifecycle result.
+migration, in addition to the lifecycle checks already recorded here. Those
+checks are the remaining acceptance criteria in Issue #16. A host-level
+`BLOCKED` result is not a successful lifecycle result.
