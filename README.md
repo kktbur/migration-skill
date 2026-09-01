@@ -26,12 +26,17 @@ Python 3.11 or newer is required. The deterministic helpers use the standard-lib
 
 ## Quick start
 
-Use the `migration-skill` directory as a repository-scoped Codex Skill. The package does not install itself globally and does not require an LLM SDK, MCP server, Docker orchestrator, or third-party Python package.
+This repository has two equivalent distribution paths:
+
+- Install the skills-only Codex Plugin described in [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json).
+- Use [`skills/migration-skill/`](skills/migration-skill/) directly as a repository-scoped raw Skill.
+
+Both paths use the same canonical Skill package. The Plugin adds discovery and lifecycle management; it does not add an LLM SDK, MCP server, Docker orchestrator, or third-party Python package.
 
 1. Run the read-only inventory:
 
    ```text
-   python scripts/inventory_project.py --root SOURCE --output .migration/inventory.json
+   python skills/migration-skill/scripts/inventory_project.py --root SOURCE --output .migration/inventory.json
    ```
 
 2. Have Codex turn the evidence into `.migration/migration.json` schema v2 and `.migration/parity-corpus.json`. Every required operation must have evidence, and every required Corpus case must name its `operation_id`.
@@ -39,7 +44,7 @@ Use the `migration-skill` directory as a repository-scoped Codex Skill. The pack
 3. Validate the Contract and Corpus:
 
    ```text
-   python scripts/validate_contract.py \
+   python skills/migration-skill/scripts/validate_contract.py \
      --contract .migration/migration.json \
      --corpus .migration/parity-corpus.json
    ```
@@ -50,7 +55,23 @@ Use the `migration-skill` directory as a repository-scoped Codex Skill. The pack
 
 6. Before every new edit, run `verify_resume.py`. After one bounded milestone, run `evaluate_milestone.py` and accept its proof set only through `advance_milestone.py`. Run the final `evaluate_migration.py` only after all milestones are complete.
 
-The full command sequence and recovery rules are in [`references/migration-workflow.md`](references/migration-workflow.md). Contract examples are in [`references/behavior-contract.md`](references/behavior-contract.md).
+The full command sequence and recovery rules are in [`skills/migration-skill/references/migration-workflow.md`](skills/migration-skill/references/migration-workflow.md). Contract examples are in [`skills/migration-skill/references/behavior-contract.md`](skills/migration-skill/references/behavior-contract.md).
+
+## Plugin distribution
+
+The repository root is a skills-only Codex Plugin. Its manifest is
+`.codex-plugin/plugin.json`, and its only Plugin component is the canonical
+`skills/migration-skill/` Skill. No MCP configuration is included. Follow the
+[official Codex Plugin documentation](https://developers.openai.com/plugins/build/plugins)
+when adding this repository to a Codex Plugin marketplace, and prefer a
+reviewed release tag or Git ref for reproducible installation.
+
+The current Plugin package is `0.2.0`. Its compatibility policy is recorded in
+[`docs/plugin-compatibility.json`](docs/plugin-compatibility.json), and the
+install, upgrade, rollback, uninstall, and frozen-verifier rules are recorded
+in [`docs/adr/0001-plugin-distribution.md`](docs/adr/0001-plugin-distribution.md).
+Updating the Plugin cannot silently replace the verifier bundle frozen for an
+in-progress migration; resume preflight must verify the recorded bundle first.
 
 ## Adapter protocol
 
@@ -82,7 +103,7 @@ Checks and adapters receive a minimum environment by default; host credentials a
 
 The runners use `shell=False`, but this is not network isolation. Package installation, native code, external services, unknown scripts, and high-risk repositories require a real sandbox/Docker boundary or a deliberate `PLAN_ONLY` result. The source remains read-only and the target is isolated by default.
 
-Read [`references/safety.md`](references/safety.md) before executing a repository with external side effects.
+Read [`skills/migration-skill/references/safety.md`](skills/migration-skill/references/safety.md) before executing a repository with external side effects.
 
 ## Completion states
 
@@ -101,15 +122,22 @@ INVALIDATED
 ## Repository layout
 
 ```text
-SKILL.md
-agents/openai.yaml
-references/
-scripts/
+.codex-plugin/plugin.json
+skills/migration-skill/
+├── SKILL.md
+├── agents/openai.yaml
+├── references/
+└── scripts/
 tests/
 benchmarks/
+docs/
+README.md
+LICENSE
 ```
 
-The deterministic helper scripts use Python's standard library only. `scripts/validate_skill.py` validates the package locally; the Skill Creator `quick_validate.py` can also be run against this directory.
+The deterministic helper scripts use Python's standard library only.
+`skills/migration-skill/scripts/validate_skill.py` validates the raw Skill
+package locally; the Plugin Creator validator validates the Plugin manifest.
 
 ## Development and CI
 
@@ -117,8 +145,8 @@ Run the same checks used by CI:
 
 ```text
 python -m unittest discover -s tests
-python -c "from pathlib import Path; import py_compile; [py_compile.compile(str(path), doraise=True) for path in Path('scripts').glob('*.py')]"
-python scripts/validate_skill.py --root .
+python -c "from pathlib import Path; import py_compile; [py_compile.compile(str(path), doraise=True) for path in Path('skills/migration-skill/scripts').glob('*.py')]"
+python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill
 ```
 
 GitHub Actions runs these checks on both Ubuntu and Windows. Tests use `unittest` and temporary directories and do not require Docker, network access, or third-party packages.
@@ -131,6 +159,6 @@ Out of scope for v1 are production deployment, production database writes, cloud
 
 ## Lineage and feedback
 
-The architectural lineage from `gpt-migrate`, Anthropic's Code Migration Kit, GitHub Next Crane, and sandboxed migration examples is documented in [`references/upstream-lineage.md`](references/upstream-lineage.md). No implementation code is copied from those projects.
+The architectural lineage from `gpt-migrate`, Anthropic's Code Migration Kit, GitHub Next Crane, and sandboxed migration examples is documented in [`skills/migration-skill/references/upstream-lineage.md`](skills/migration-skill/references/upstream-lineage.md). No implementation code is copied from those projects.
 
 Please report reproducible defects, unsafe behavior, or adapter compatibility issues through the repository's [GitHub Issues](https://github.com/kktbur/migration-skill/issues). Maintenance should keep the verifier bundle, schema validation, mutation tests, cross-platform CI, and benchmark evidence in sync whenever a protocol rule changes.

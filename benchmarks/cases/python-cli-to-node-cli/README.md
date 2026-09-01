@@ -22,8 +22,8 @@ Codex writes the generated implementation into `generated-target/` and supplies 
 Validate the case metadata without executing a Target:
 
 ```text
-python ../../../scripts/validate_contract.py --contract migration.json --corpus parity-corpus.json
-python ../../../scripts/validate_plan.py --plan migration-plan.json --contract migration.json --corpus parity-corpus.json
+python ../../../skills/migration-skill/scripts/validate_contract.py --contract migration.json --corpus parity-corpus.json
+python ../../../skills/migration-skill/scripts/validate_plan.py --plan migration-plan.json --contract migration.json --corpus parity-corpus.json
 python -m unittest discover -s source
 ```
 

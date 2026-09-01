@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "plugin": {
+    "name": "migration-skill",
+    "version": "0.2.0"
+  },
+  "protocol": {
+    "contract_schema": 2,
+    "freeze_schema": 3
+  },
+  "supported_combinations": [
+    {
+      "plugin_range": "0.2.x",
+      "contract_schema": 2,
+      "freeze_schema": 3,
+      "status": "supported"
+    }
+  ],
+  "future_combinations": [
+    {
+      "plugin_range": "0.3.x",
+      "contract_schema": 3,
+      "freeze_schema": 4,
+      "status": "migration_required"
+    }
+  ],
+  "in_progress_migration": {
+    "verify_frozen_bundle_before_use": true,
+    "plugin_update_cannot_replace_bundle": true,
+    "on_bundle_mismatch": "invalidate-and-rebuild-evidence",
+    "preserve_migration_workspace": true
+  }
+}

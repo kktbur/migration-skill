@@ -39,7 +39,7 @@ jobs:
       - name: Compile deterministic scripts
         run: >-
           python -c "from pathlib import Path; import py_compile;
-          [py_compile.compile(str(path), doraise=True) for path in Path('scripts').glob('*.py')]"
+          [py_compile.compile(str(path), doraise=True) for path in Path('skills/migration-skill/scripts').glob('*.py')]"
 
       - name: Validate Skill package
-        run: python scripts/validate_skill.py --root .
+        run: python skills/migration-skill/scripts/validate_skill.py --root skills/migration-skill

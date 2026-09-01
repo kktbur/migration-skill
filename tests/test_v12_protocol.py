@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT_ROOT = Path(__file__).resolve().parents[1] / "scripts"
+SCRIPT_ROOT = Path(__file__).resolve().parents[1] / "skills" / "migration-skill" / "scripts"
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
